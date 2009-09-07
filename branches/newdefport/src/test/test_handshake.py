@@ -191,14 +191,6 @@ class HandshakerTest(unittest.TestCase):
         self.assertEqual(_GOOD_RESPONSE_NO_PROTOCOL, conn.written_data())
         self.assertEqual(None, conn_context.protocol)
 
-    def test_port_mismatch(self):
-        conn = mock.MockConn(_GOOD_REQUEST)
-        conn.local_addr = ('0.0.0.0', 81)
-        conn_context = conncontext.ConnContext(conn)
-        handshaker = handshake.Handshaker(conn_context,
-                                          mock.MockDispatcher())
-        self.assertRaises(handshake.HandshakeError, handshaker.shake_hands)
-
     def test_good_request_optional_headers(self):
         conn = mock.MockConn(_GOOD_REQUEST_WITH_OPTIONAL_HEADERS)
         conn.local_addr = ('0.0.0.0', 80)

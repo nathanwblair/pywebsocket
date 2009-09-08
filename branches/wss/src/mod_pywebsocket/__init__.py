@@ -38,7 +38,7 @@ Installation:
 
    Example snippet of httpd.conf:
    (mod_pywebsocket is in /websock_lib, Web Socket handlers are in
-   /websock_handlers, port is 80 for ws, 443 for wss)
+   /websock_handlers, port is 80 for ws, 443 for wss.)
 
        <IfModule python_module>
 
@@ -62,6 +62,10 @@ Installation:
 
        </IfModule>
 
+    Note:
+    The above httpd.conf won't work if port 80 and 443 are already used
+    for other purposes, e.g., for HTTP and HTTPS. Use different ports in
+    such cases.
 
 Writing Web Socket handlers:
 

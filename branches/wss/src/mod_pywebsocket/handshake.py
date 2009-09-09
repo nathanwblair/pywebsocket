@@ -21,6 +21,8 @@ import re
 
 _DEFAULT_WEB_SOCKET_PORT = 80
 _DEFAULT_WEB_SOCKET_SECURE_PORT = 443
+_WEB_SOCKET_SCHEME = 'ws'
+_WEB_SOCKET_SECURE_SCHEME = 'wss'
 
 _METHOD_LINE = re.compile(r'^GET ([^ ]+) HTTP/1.1\r\n$')
 
@@ -85,9 +87,10 @@ class Handshaker(object):
 
     def _set_location(self):
         location_parts = []
-        location_parts.append('ws')
         if self._conn_context.secure:
-            location_parts.append('s')
+            location_parts.append(_WEB_SOCKET_SECURE_SCHEME)
+        else:
+            location_parts.append(_WEB_SOCKET_SCHEME)
         location_parts.append('://')
         host, port = self._parse_host_header()
         conn_port = self._conn_context.conn.local_addr[1]

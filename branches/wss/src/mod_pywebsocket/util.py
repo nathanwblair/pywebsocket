@@ -60,5 +60,4 @@ def parse_port_list(port_list):
     return ports, warnings
 
 
-
 # vi:sts=4 sw=4 et

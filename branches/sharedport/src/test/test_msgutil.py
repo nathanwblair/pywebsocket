@@ -27,37 +27,37 @@ from mod_pywebsocket import msgutil
 import mock
 
 
-def _CreateRequest(read_data):
+def _create_request(read_data):
     return mock.MockRequest(connection=mock.MockConn(read_data))
 
-def _CreateBlockingRequest():
+def _create_blocking_request():
     return mock.MockRequest(connection=mock.MockBlockingConn())
 
 class MessageTest(unittest.TestCase):
     def test_send_message(self):
-        request = _CreateRequest('')
+        request = _create_request('')
         msgutil.send_message(request, 'Hello')
         self.assertEqual('\x00Hello\xff', request.connection.written_data())
 
     def test_send_message_unicode(self):
-        request = _CreateRequest('')
+        request = _create_request('')
         msgutil.send_message(request, u'\u65e5')
         # U+65e5 is encoded as e6,97,a5 in UTF-8
         self.assertEqual('\x00\xe6\x97\xa5\xff',
                          request.connection.written_data())
 
     def test_receive_message(self):
-        request = _CreateRequest('\x00Hello\xff\x00World!\xff')
+        request = _create_request('\x00Hello\xff\x00World!\xff')
         self.assertEqual('Hello', msgutil.receive_message(request))
         self.assertEqual('World!', msgutil.receive_message(request))
 
     def test_receive_message_unicode(self):
-        request = _CreateRequest('\x00\xe6\x9c\xac\xff')
+        request = _create_request('\x00\xe6\x9c\xac\xff')
         # U+672c is encoded as e6,9c,ac in UTF-8
         self.assertEqual(u'\u672c', msgutil.receive_message(request))
 
     def test_receive_message_discard(self):
-        request = _CreateRequest('\x80\x06IGNORE\x00Hello\xff'
+        request = _create_request('\x80\x06IGNORE\x00Hello\xff'
                                 '\x01DISREGARD\xff\x00World!\xff')
         self.assertEqual('Hello', msgutil.receive_message(request))
         self.assertEqual('World!', msgutil.receive_message(request))
@@ -66,22 +66,22 @@ class MessageTest(unittest.TestCase):
         for length, bytes in ((0, '\x00'), (0x7f, '\x7f'), (0x80, '\x81\x00'),
                               (0x1234, '\x80\xa4\x34')):
             self.assertEqual(length,
-                             msgutil._payload_length(_CreateRequest(bytes)))
+                             msgutil._payload_length(_create_request(bytes)))
 
     def test_receive_bytes(self):
-        request = _CreateRequest('abcdefg')
+        request = _create_request('abcdefg')
         self.assertEqual('abc', msgutil._receive_bytes(request, 3))
         self.assertEqual('defg', msgutil._receive_bytes(request, 4))
 
     def test_read_until(self):
-        request = _CreateRequest('abcXdefgX')
+        request = _create_request('abcXdefgX')
         self.assertEqual('abc', msgutil._read_until(request, 'X'))
         self.assertEqual('defg', msgutil._read_until(request, 'X'))
 
 
 class MessageReceiverTest(unittest.TestCase):
     def test_queue(self):
-        request = _CreateBlockingRequest()
+        request = _create_blocking_request()
         receiver = msgutil.MessageReceiver(request)
 
         self.assertEqual(None, receiver.receive_nowait())
@@ -94,7 +94,7 @@ class MessageReceiverTest(unittest.TestCase):
         def onmessage_handler(message):
             onmessage_queue.put(message)
 
-        request = _CreateBlockingRequest()
+        request = _create_blocking_request()
         receiver = msgutil.MessageReceiver(request, onmessage_handler)
 
         request.connection.put_bytes('\x00Hello!\xff')
@@ -103,7 +103,7 @@ class MessageReceiverTest(unittest.TestCase):
 
 class MessageSenderTest(unittest.TestCase):
     def test_send(self):
-        request = _CreateBlockingRequest()
+        request = _create_blocking_request()
         sender = msgutil.MessageSender(request)
 
         sender.send('World')
@@ -116,7 +116,7 @@ class MessageSenderTest(unittest.TestCase):
         send_queue = Queue.Queue()
         def write(bytes):
             send_queue.put(bytes)
-        request = _CreateBlockingRequest()
+        request = _create_blocking_request()
         request.connection.write = write
 
         sender = msgutil.MessageSender(request)

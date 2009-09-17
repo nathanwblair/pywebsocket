@@ -54,7 +54,7 @@ specified in the handshake is considered as if it is a file path under
 <websock_handlers>/<resource_name>_wsh.py is invoked.
 
 For example, if the resource name is /example/chat, the handler defined in
-<handler_root>/example/chat_wsh.py is invoked.
+<websock_handlers>/example/chat_wsh.py is invoked.
 
 A Web Socket handler is composed of the following two functions:
 
@@ -65,9 +65,9 @@ where:
     request: mod_python request.
 
 web_socket_shake_hands is called during the handshake after the headers
-are successfully parsed and Web Socket properties ( ws_location,
+are successfully parsed and Web Socket properties (ws_location,
 ws_origin, ws_protocol, and ws_resource) are added to request.
-A handler can reject the connection by raising an exception.
+A handler can reject the request by raising an exception.
 
 web_socket_transfer_data is called after the handshake completed
 successfully. A handler can receive/send messages from/to the client

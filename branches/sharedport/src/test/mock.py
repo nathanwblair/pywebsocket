@@ -149,7 +149,7 @@ class MockTable(dict):
 
 class MockRequest(object):
     """Mock request.
-    
+
     This mimics mod_python request.
     """
 

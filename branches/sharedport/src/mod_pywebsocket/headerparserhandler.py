@@ -48,7 +48,7 @@ _dispatcher = _create_dispatcher()
 
 
 def headerparserhandler(request):
-    """Handle connection.
+    """Handle request.
 
     Args:
         request: mod_python request.
@@ -71,7 +71,7 @@ def headerparserhandler(request):
     except dispatch.DispatchError, e:
         request.log_error('mod_pywebsocket: %s' % e, apache.APLOG_WARNING)
         return apache.DECLINED
-    return apache.DONE
+    return apache.DONE  # Return DONE such that no other handlers are invoked.
 
 
 # vi:sts=4 sw=4 et

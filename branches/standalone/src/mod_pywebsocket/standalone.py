@@ -80,10 +80,10 @@ class _StandaloneRequest(object):
     headers_in = property(get_headers_in)
 
     def is_https(self):
-        """Mimic request.is_uttps()."""
+        """Mimic request.is_https()."""
         # TODO(yuzo): Implement this.
         return False
-  
+
 
 class WebSocketServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
     """HTTPServer specialized for Web Socket."""
@@ -110,9 +110,12 @@ class WebSocketRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         if warnings:
             for warning in warnings:
                 logging.warning('mod_pywebsocket: %s' % warning)
-  
+
     def parse_request(self):
-        """Override BaseHTTPServer.BaseHTTPRequestHandler.parse_request."""
+        """Override BaseHTTPServer.BaseHTTPRequestHandler.parse_request.
+        
+        Return True to continue processing for HTTP(S), False otherwise.
+        """
         result = SimpleHTTPServer.SimpleHTTPRequestHandler.parse_request(self)
         if result:
             try:
@@ -147,7 +150,7 @@ def _main():
 
 
 if __name__ == '__main__':
-  _main()
+    _main()
 
 
 # vi:sts=4 sw=4 et

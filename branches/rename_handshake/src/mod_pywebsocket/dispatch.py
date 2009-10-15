@@ -40,7 +40,7 @@ import util
 
 _SOURCE_PATH_PATTERN = re.compile(r'(?i)_wsh\.py$')
 _SOURCE_SUFFIX = '_wsh.py'
-_SHAKE_HANDS_HANDLER_NAME = 'web_socket_shake_hands'
+_SHAKE_HANDS_EXTRA_HANDLER_NAME = 'web_socket_shake_hands_extra'
 _TRANSFER_DATA_HANDLER_NAME = 'web_socket_transfer_data'
 
 
@@ -100,7 +100,7 @@ def _source(source_str):
     except Exception:
         raise DispatchError('Error in sourcing handler:' +
                             util.get_stack_trace())
-    return (_extract_handler(global_dic, _SHAKE_HANDS_HANDLER_NAME),
+    return (_extract_handler(global_dic, _SHAKE_HANDS_EXTRA_HANDLER_NAME),
             _extract_handler(global_dic, _TRANSFER_DATA_HANDLER_NAME))
 
 
@@ -140,7 +140,7 @@ class Dispatcher(object):
         """Hook into Web Socket handshake.
 
         Select a handler based on request.uri and call its
-        web_socket_shake_hands function.
+        web_socket_shake_hands_extra function.
 
         Args:
             request: mod_python request.
@@ -150,8 +150,8 @@ class Dispatcher(object):
         try:
             shake_hands_(request)
         except Exception:
-            raise DispatchError('shake_hands() raised exception: ' +
-                                util.get_stack_trace())
+            raise DispatchError('%s raised exception: %s' %
+                    (_SHAKE_HANDS_EXTRA_HANDLER_NAME, util.get_stack_trace()))
 
     def transfer_data(self, request):
         """Let a handler transfer_data with a Web Socket client.
@@ -167,8 +167,8 @@ class Dispatcher(object):
         try:
             transfer_data_(request)
         except Exception:
-            raise DispatchError('transfer_data() raised exception: ' +
-                                util.get_stack_trace())
+            raise DispatchError('%s raised exception: %s' %
+                    (_TRANSFER_DATA_HANDLER_NAME, util.get_stack_trace()))
 
     def _handler(self, request):
         try:

@@ -32,7 +32,7 @@
 """
 
 
-web_socket_shake_hands = True
+web_socket_shake_hands_extra = True
 web_socket_transfer_data = 1
 
 

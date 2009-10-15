@@ -97,7 +97,7 @@ class DispatcherTest(unittest.TestCase):
         self.assertRaises(dispatch.DispatchError, dispatch._source, 'def')
         self.assertRaises(dispatch.DispatchError, dispatch._source, '1/0')
         self.failUnless(dispatch._source(
-                'def web_socket_shake_hands(request):pass\n'
+                'def web_socket_shake_hands_extra(request):pass\n'
                 'def web_socket_transfer_data(request):pass\n'))
 
     def test_source_warnings(self):
@@ -106,11 +106,11 @@ class DispatcherTest(unittest.TestCase):
         warnings.sort()
         expected_warnings = [
                 (os.path.join(_TEST_HANDLERS_DIR, 'b_wsh.py') + ': '
-                 'web_socket_shake_hands is not defined.'),
+                 'web_socket_shake_hands_extra is not defined.'),
                 (os.path.join(_TEST_HANDLERS_DIR, 'sub', 'c_wsh.py') + ': '
-                 'web_socket_shake_hands is not callable.'),
+                 'web_socket_shake_hands_extra is not callable.'),
                 (os.path.join(_TEST_HANDLERS_DIR, 'sub', 'g_wsh.py') + ': '
-                 'web_socket_shake_hands is not defined.'),
+                 'web_socket_shake_hands_extra is not defined.'),
                 (os.path.join(_TEST_HANDLERS_DIR, 'sub', 'h_wsh.py') + ': '
                  'web_socket_transfer_data is not defined.'),
                 ]

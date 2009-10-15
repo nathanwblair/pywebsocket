@@ -31,7 +31,7 @@
 from mod_pywebsocket import msgutil
 
 
-def web_socket_shake_hands(request):
+def web_socket_shake_hands_extra(request):
     pass  # always accept
 
 

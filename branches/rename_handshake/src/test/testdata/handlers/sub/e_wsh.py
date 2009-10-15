@@ -28,7 +28,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-def web_socket_shake_hands_extra(request):
+def web_socket_do_extra_handshake(request):
     pass
 
 

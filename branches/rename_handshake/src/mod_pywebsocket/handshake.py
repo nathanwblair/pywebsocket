@@ -97,7 +97,7 @@ class Handshaker(object):
         self._set_origin()
         self._set_location()
         self._set_protocol()
-        self._dispatcher.shake_hands(self._request)
+        self._dispatcher.shake_hands_extra(self._request)
         self._send_handshake()
 
     def _set_resource(self):

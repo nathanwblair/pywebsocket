@@ -123,11 +123,11 @@ class DispatcherTest(unittest.TestCase):
         request = mock.MockRequest()
         request.ws_resource = '/a'
         request.ws_origin = 'http://example.com'
-        dispatcher.shake_hands(request)  # Must not raise exception.
+        dispatcher.shake_hands_extra(request)  # Must not raise exception.
 
         request.ws_origin = 'http://bad.example.com'
         self.assertRaises(dispatch.DispatchError,
-                          dispatcher.shake_hands, request)
+                          dispatcher.shake_hands_extra, request)
 
     def test_transfer_data(self):
         dispatcher = dispatch.Dispatcher(_TEST_HANDLERS_DIR)

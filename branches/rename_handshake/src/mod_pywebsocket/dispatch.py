@@ -136,8 +136,8 @@ class Dispatcher(object):
 
         return self._source_warnings
 
-    def shake_hands(self, request):
-        """Hook into Web Socket handshake.
+    def shake_hands_extra(self, request):
+        """Do extra checking in Web Socket handshake.
 
         Select a handler based on request.uri and call its
         web_socket_shake_hands_extra function.
@@ -146,9 +146,9 @@ class Dispatcher(object):
             request: mod_python request.
         """
 
-        shake_hands_, _ = self._handler(request)
+        shake_hands_extra_, _ = self._handler(request)
         try:
-            shake_hands_(request)
+            shake_hands_extra_(request)
         except Exception:
             raise DispatchError('%s raised exception: %s' %
                     (_SHAKE_HANDS_EXTRA_HANDLER_NAME, util.get_stack_trace()))

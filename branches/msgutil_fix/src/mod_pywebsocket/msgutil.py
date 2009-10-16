@@ -214,7 +214,6 @@ class MessageSender(threading.Thread):
         self._queue.put((message, condition))
         condition.wait()
 
-
     def send_nowait(self, message):
         """Send a message, non-blocking."""
 

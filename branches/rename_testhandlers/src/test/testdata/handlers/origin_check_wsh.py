@@ -35,7 +35,7 @@ def web_socket_do_extra_handshake(request):
 
 
 def web_socket_transfer_data(request):
-    request.connection.write('a_wsh.py is called for %s, %s' %
+    request.connection.write('origin_check_wsh.py is called for %s, %s' %
                              (request.ws_resource, request.ws_protocol))
 
 

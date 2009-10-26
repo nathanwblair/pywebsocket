@@ -244,8 +244,8 @@ def _main():
     if not options.scan_dir:
         options.scan_dir = options.websock_handlers
 
-    # Use one static dispatcher for all requests to save creation cost.
-    # Once created, a dispatcher is thread-safe.
+    # Share a Dispatcher among request handlers to save time for instantiation.
+    # Dispatcher can be shared because it is thread-safe.
     options.dispatcher = dispatch.Dispatcher(options.websock_handlers,
                                              options.scan_dir)
     _print_warnings_if_any(options.dispatcher)

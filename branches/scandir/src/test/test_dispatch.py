@@ -208,6 +208,12 @@ class DispatcherTest(unittest.TestCase):
         self.failUnless(disp._handlers.has_key('/exception_in_transfer'))
         self.failUnless(disp._handlers.has_key('/plain'))
 
+    def test_scan_dir_must_under_root(self):
+        dispatch.Dispatcher('a/b', 'a/b/c')  # OK
+        dispatch.Dispatcher('a/b///', 'a/b')  # OK
+        self.assertRaises(dispatch.DispatchError,
+                          dispatch.Dispatcher, 'a/b/c', 'a/b')
+
 
 if __name__ == '__main__':
     unittest.main()

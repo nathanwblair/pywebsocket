@@ -119,7 +119,7 @@ class Dispatcher(object):
     This class maintains a map from resource name to handlers.
     """
 
-    def __init__(self, root_dir, scan_dir):
+    def __init__(self, root_dir, scan_dir=None):
         """Construct an instance.
 
         Args:

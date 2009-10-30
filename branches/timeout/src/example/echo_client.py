@@ -46,6 +46,8 @@ import socket
 import sys
 
 
+_TIMEOUT_SEC = 10
+
 _DEFAULT_PORT = 80
 _DEFAULT_SECURE_PORT = 443
 _UNDEFINED_PORT = -1
@@ -57,6 +59,7 @@ _EXPECTED_RESPONSE = (
         _UPGRADE_HEADER +
         _CONNECTION_HEADER)
 
+socket.setdefaulttimeout(_TIMEOUT_SEC)
 
 def _method_line(resource):
     return 'GET %s HTTP/1.1\r\n' % resource

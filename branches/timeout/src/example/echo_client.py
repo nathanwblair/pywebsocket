@@ -59,7 +59,6 @@ _EXPECTED_RESPONSE = (
         _UPGRADE_HEADER +
         _CONNECTION_HEADER)
 
-socket.setdefaulttimeout(_TIMEOUT_SEC)
 
 def _method_line(resource):
     return 'GET %s HTTP/1.1\r\n' % resource
@@ -99,6 +98,7 @@ class EchoClient(object):
         Shake hands and then repeat sending message and receiving its echo.
         """
         self._socket = socket.socket()
+        self._socket.settimeout(self._options.socket_timeout)
         try:
             self._socket.connect((self._options.server_host,
                                   self._options.server_port))
@@ -174,6 +174,10 @@ def main():
                       default=True, help='suppress messages')
     parser.add_option('-t', '--tls', dest='use_tls', action='store_true',
                       default=False, help='use TLS (wss://)')
+    parser.add_option('-k', '--socket_timeout', dest='socket_timeout',
+                      type='int', default=_TIMEOUT_SEC,
+                      help='Timeout(sec) for sockets')
+
     (options, unused_args) = parser.parse_args()
 
     # Default port number depends on whether TLS is used.

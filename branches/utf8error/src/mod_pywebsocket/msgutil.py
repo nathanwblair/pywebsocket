@@ -74,7 +74,7 @@ def receive_message(request):
             # The payload is delimited with \xff.
             bytes = _read_until(request, '\xff')
             # The Web Socket protocol section 4.4 specifies that invalid
-            # characters be replaced with U+fffd REPLACEMENT CHARACTER.
+            # characters must be replaced with U+fffd REPLACEMENT CHARACTER.
             message = bytes.decode('utf-8', 'replace')
             if frame_type == 0x00:
                 return message

@@ -172,8 +172,9 @@ def main():
     parser.add_option('-r', '--resource', dest='resource', type='string',
                       default='/echo', help='resource path')
     parser.add_option('-m', '--message', dest='message', type='string',
-                      help='comma-separated messages to send ' +
-                           'excluding Goodbye that is always sent at the end')
+                      help=('comma-separated messages to send excluding "%s" '
+                            'that is always sent at the end' %
+                            _GOODBYE_MESSAGE))
     parser.add_option('-q', '--quiet', dest='verbose', action='store_false',
                       default=True, help='suppress messages')
     parser.add_option('-t', '--tls', dest='use_tls', action='store_true',

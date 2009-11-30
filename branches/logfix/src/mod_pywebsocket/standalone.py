@@ -179,6 +179,8 @@ class WebSocketServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
         logging.error(
             ('Exception in processing request from: %r' % (client_address,)) +
             '\n' + util.get_stack_trace())
+        # Note: client_address is a tuple. To match it against %r, we need the
+        # trailing comma.
 
 
 class WebSocketRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):

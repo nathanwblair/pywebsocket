@@ -237,6 +237,9 @@ class HandshakerTest(unittest.TestCase):
         handshake._validate_protocol('sample\x7eprotocol')  # should succeed.
         self.assertRaises(handshake.HandshakeError,
                           handshake._validate_protocol,
+                          '')
+        self.assertRaises(handshake.HandshakeError,
+                          handshake._validate_protocol,
                           'sample\x19protocol')
         self.assertRaises(handshake.HandshakeError,
                           handshake._validate_protocol,

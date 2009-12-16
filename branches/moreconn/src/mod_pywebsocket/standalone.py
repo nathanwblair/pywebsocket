@@ -89,6 +89,8 @@ _LOG_LEVELS = {
 _DEFAULT_LOG_MAX_BYTES = 1024 * 256
 _DEFAULT_LOG_BACKUP_COUNT = 5
 
+_REQUEST_QUEUE_SIZE = 128
+
 # 1024 is practically large enough to contain WebSocket handshake lines.
 _MAX_MEMORIZED_LINES = 1024
 
@@ -169,6 +171,7 @@ class WebSocketServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
     """HTTPServer specialized for Web Socket."""
 
     SocketServer.ThreadingMixIn.daemon_threads = True
+    SocketServer.TCPServer.request_queue_size = _REQUEST_QUEUE_SIZE
 
     def __init__(self, server_address, RequestHandlerClass):
         """Override SocketServer.BaseServer.__init__."""

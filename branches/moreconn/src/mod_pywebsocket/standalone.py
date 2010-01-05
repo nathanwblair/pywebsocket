@@ -174,6 +174,7 @@ class WebSocketServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
 
     def __init__(self, server_address, RequestHandlerClass):
         """Override SocketServer.BaseServer.__init__."""
+
         SocketServer.BaseServer.__init__(
                 self, server_address, RequestHandlerClass)
         self.socket = self._create_socket()

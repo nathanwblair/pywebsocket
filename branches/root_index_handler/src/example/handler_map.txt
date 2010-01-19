@@ -1,0 +1,8 @@
+# websocket handler map file, used by standalone.py -m option.
+# A line starting with '#' is a comment line.
+# Each line consists of 'resource_path' and 'handler_key' separated by spaces.
+# For example,
+#  / /echo
+# means that a request to '/' will be handled by handlers for '/echo'.
+/ /echo
+

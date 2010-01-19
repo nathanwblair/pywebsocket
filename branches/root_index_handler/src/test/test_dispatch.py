@@ -225,6 +225,15 @@ class DispatcherTest(unittest.TestCase):
         self.assertRaises(dispatch.DispatchError,
                           dispatch.Dispatcher, 'a/b/c', 'a/b')
 
+    def test_resource_path_alias(self):
+        disp = dispatch.Dispatcher(_TEST_HANDLERS_DIR, None)
+        disp.add_resource_path_alias('/', '/origin_check')
+        self.assertEqual(4, len(disp._handlers))
+        self.failUnless(disp._handlers.has_key('/origin_check'))
+        self.failUnless(disp._handlers.has_key('/sub/exception_in_transfer'))
+        self.failUnless(disp._handlers.has_key('/sub/plain'))
+        self.failUnless(disp._handlers.has_key('/'))
+
 
 if __name__ == '__main__':
     unittest.main()

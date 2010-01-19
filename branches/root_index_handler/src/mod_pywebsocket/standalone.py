@@ -282,6 +282,31 @@ def _configure_logging(options):
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
+def _alias_handlers(dispatcher, websock_handlers_map_file):
+    """Set aliases specified in websock_handler_map_file in dispatcher.
+
+    Args:
+        dispatcher: dispatch.Dispatcher instance
+        websock_handler_map_file: alias map file
+    """
+    fp = open(websock_handlers_map_file)
+    try:
+        for line in fp:
+            if line[0] == '#' or line.isspace():
+                continue
+            m = re.match('(\S+)\s+(\S+)', line)
+            if not m:
+                logging.warning('Wrong format in map file:' + line)
+                continue
+            try:
+                dispatcher.add_resource_path_alias(
+                    m.group(1), m.group(2))
+            except dispatch.DispatchError, e:
+                logging.error(str(e))
+    finally:
+        fp.close()
+
+
 
 def _main():
     parser = optparse.OptionParser()
@@ -353,18 +378,8 @@ def _main():
         options.dispatcher = dispatch.Dispatcher(options.websock_handlers,
                                                  options.scan_dir)
         if options.websock_handlers_map_file:
-            fp = open(options.websock_handlers_map_file)
-            for line in fp:
-                if line[0] == '#' or line.isspace():
-                    continue
-                m = re.match('(\S+)\s+(\S+)', line)
-                if not m:
-                    logging.warning('Wrong format in map file:' + line)
-                    continue
-                options.dispatcher.add_resource_path_alias(
-                    m.group(1), m.group(2))
-            fp.close()
-
+            _alias_handlers(options.dispatcher,
+                            options.websock_handlers_map_file)
         _print_warnings_if_any(options.dispatcher)
 
         WebSocketRequestHandler.options = options

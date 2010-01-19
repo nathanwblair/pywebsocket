@@ -142,17 +142,22 @@ class Dispatcher(object):
                                 'root_dir:%s.' % (scan_dir, root_dir))
         self._source_files_in_dir(root_dir, scan_dir)
 
-    def add_resource_path_alias(self, resource_path, handler_key):
+    def add_resource_path_alias(self,
+                                alias_resource_path, existing_resource_path):
         """Add resource path alias.
 
-        Once added, request to resource_path would be handled by
-        handler registered for handler_key.
+        Once added, request to alias_resource_path would be handled by
+        handler registered for existing_resource_path.
 
         Args:
-            resource_path: resource path
-            handler_key: handler key
+            alias_resource_path: alias resource path
+            existing_resource_path: existing resource path
         """
-        self._handlers[resource_path] = self._handlers[handler_key]
+        try:
+            handler = self._handlers[existing_resource_path]
+            self._handlers[alias_resource_path] = handler
+        except KeyError:
+            raise DispatchError('No handler for: %r' % existing_resource_path)
 
     def source_warnings(self):
         """Return warnings in sourcing handlers."""

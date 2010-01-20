@@ -320,8 +320,8 @@ def _main():
                       dest='websock_handlers_map_file',
                       default=None,
                       help=('Web Socket handlers map file. '
-                            'Each line consists of resource_path and '
-                            'handler_key, separated by spaces.'))
+                            'Each line consists of alias_resource_path and '
+                            'existing_resource_path, separated by spaces.'))
     parser.add_option('-s', '--scan_dir', dest='scan_dir',
                       default=None,
                       help=('Web Socket handlers scan directory. '

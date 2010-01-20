@@ -233,6 +233,8 @@ class DispatcherTest(unittest.TestCase):
         self.failUnless(disp._handlers.has_key('/sub/exception_in_transfer'))
         self.failUnless(disp._handlers.has_key('/sub/plain'))
         self.failUnless(disp._handlers.has_key('/'))
+        self.assertRaises(dispatch.DispatchError,
+                          disp.add_resource_path_alias, '/alias', '/not-exist')
 
 
 if __name__ == '__main__':

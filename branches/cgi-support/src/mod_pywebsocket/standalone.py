@@ -58,6 +58,7 @@ used for each request.
 """
 
 import BaseHTTPServer
+import CGIHTTPServer
 import SimpleHTTPServer
 import SocketServer
 import logging
@@ -202,8 +203,8 @@ class WebSocketServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
         # trailing comma.
 
 
-class WebSocketRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
-    """SimpleHTTPRequestHandler specialized for Web Socket."""
+class WebSocketRequestHandler(CGIHTTPServer.CGIHTTPRequestHandler):
+    """CGIHTTPRequestHandler specialized for Web Socket."""
 
     def setup(self):
         """Override SocketServer.StreamRequestHandler.setup."""
@@ -329,6 +330,11 @@ def _main():
     parser.add_option('-d', '--document_root', dest='document_root',
                       default='.',
                       help='Document root directory.')
+    parser.add_option('-x', '--cgi_path', dest='cgi_path',
+                      default=None,
+                      help=('CGI path relative to document_root.'
+                            'Files under document_root/cgi_path are handled '
+                            'as CGI programs. Must be executable.'))
     parser.add_option('-t', '--tls', dest='use_tls', action='store_true',
                       default=False, help='use TLS (wss://)')
     parser.add_option('-k', '--private_key', dest='private_key',
@@ -359,6 +365,11 @@ def _main():
     _configure_logging(options)
 
     SocketServer.TCPServer.request_queue_size = options.request_queue_size
+    CGIHTTPServer.CGIHTTPRequestHandler.cgi_directories = []
+
+    if options.cgi_path:
+        CGIHTTPServer.CGIHTTPRequestHandler.cgi_directories = [
+            options.cgi_path]
 
     if options.use_tls:
         if not _HAS_OPEN_SSL:

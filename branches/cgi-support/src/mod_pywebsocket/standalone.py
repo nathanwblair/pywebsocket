@@ -277,7 +277,7 @@ class WebSocketRequestHandler(CGIHTTPServer.CGIHTTPRequestHandler):
         """Test whether self.path corresponds to a CGI script.
 
         Add extra check that self.cgi_info[1] doesn't contains .."""
-        if CGIHTTPServer.is_cgi(self):
+        if CGIHTTPServer.CGIHTTPRequestHandler.is_cgi(self):
             if '..' in self.cgi_info[1]:
                 return Flase
             return True
@@ -344,9 +344,10 @@ def _main():
     parser.add_option('-d', '--document_root', dest='document_root',
                       default='.',
                       help='Document root directory.')
-    parser.add_option('-x', '--cgi_path', dest='cgi_path',
+    parser.add_option('-x', '--cgi_paths', dest='cgi_paths',
                       default=None,
-                      help=('CGI path relative to document_root.'
+                      help=('CGI paths relative to document_root.'
+                            'Comma-separated. (e.g -x /cgi,/htbin) '
                             'Files under document_root/cgi_path are handled '
                             'as CGI programs. Must be executable.'))
     parser.add_option('-t', '--tls', dest='use_tls', action='store_true',
@@ -381,9 +382,9 @@ def _main():
     SocketServer.TCPServer.request_queue_size = options.request_queue_size
     CGIHTTPServer.CGIHTTPRequestHandler.cgi_directories = []
 
-    if options.cgi_path:
-        CGIHTTPServer.CGIHTTPRequestHandler.cgi_directories = [
-            options.cgi_path]
+    if options.cgi_paths:
+        CGIHTTPServer.CGIHTTPRequestHandler.cgi_directories = \
+            options.cgi_paths.split(',')
 
     if options.use_tls:
         if not _HAS_OPEN_SSL:

@@ -55,6 +55,10 @@ under scan_dir are scanned. This is useful in saving scan time.
 Note:
 This server is derived from SocketServer.ThreadingMixIn. Hence a thread is
 used for each request.
+
+SECURITY WARNING: This uses CGIHTTPServer and CGIHTTPServer is not secure.
+It may execute arbitrary Python code or external programs. It should not be
+used outside a firewall.
 """
 
 import BaseHTTPServer
@@ -223,7 +227,7 @@ class WebSocketRequestHandler(CGIHTTPServer.CGIHTTPRequestHandler):
         self._handshaker = handshake.Handshaker(
                 self._request, self._dispatcher,
                 WebSocketRequestHandler.options.strict)
-        SimpleHTTPServer.SimpleHTTPRequestHandler.__init__(
+        CGIHTTPServer.CGIHTTPRequestHandler.__init__(
                 self, *args, **keywords)
 
     def _print_warnings_if_any(self):
@@ -237,7 +241,7 @@ class WebSocketRequestHandler(CGIHTTPServer.CGIHTTPRequestHandler):
 
         Return True to continue processing for HTTP(S), False otherwise.
         """
-        result = SimpleHTTPServer.SimpleHTTPRequestHandler.parse_request(self)
+        result = CGIHTTPServer.CGIHTTPRequestHandler.parse_request(self)
         if result:
             try:
                 self._handshaker.do_handshake()
@@ -268,6 +272,16 @@ class WebSocketRequestHandler(CGIHTTPServer.CGIHTTPRequestHandler):
         # Despite the name, this method is for warnings than for errors.
         # For example, HTTP status code is logged by this method.
         logging.warn('%s - %s' % (self.address_string(), (args[0] % args[1:])))
+
+    def is_cgi(self):
+        """Test whether self.path corresponds to a CGI script.
+
+        Add extra check that self.cgi_info[1] doesn't contains .."""
+        if CGIHTTPServer.is_cgi(self):
+            if '..' in self.cgi_info[1]:
+                return Flase
+            return True
+        return False
 
 
 def _configure_logging(options):

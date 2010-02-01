@@ -279,7 +279,7 @@ class WebSocketRequestHandler(CGIHTTPServer.CGIHTTPRequestHandler):
         Add extra check that self.cgi_info[1] doesn't contains .."""
         if CGIHTTPServer.CGIHTTPRequestHandler.is_cgi(self):
             if '..' in self.cgi_info[1]:
-                return Flase
+                return False
             return True
         return False
 

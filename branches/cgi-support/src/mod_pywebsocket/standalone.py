@@ -276,9 +276,9 @@ class WebSocketRequestHandler(CGIHTTPServer.CGIHTTPRequestHandler):
     def is_cgi(self):
         """Test whether self.path corresponds to a CGI script.
 
-        Add extra check that self.cgi_info[1] doesn't contains .."""
+        Add extra check that self.path doesn't contains .."""
         if CGIHTTPServer.CGIHTTPRequestHandler.is_cgi(self):
-            if '..' in self.cgi_info[1]:
+            if '..' in self.path:
                 return False
             return True
         return False

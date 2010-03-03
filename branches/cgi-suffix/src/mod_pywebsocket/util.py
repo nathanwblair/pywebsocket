@@ -35,7 +35,6 @@
 import StringIO
 import os
 import re
-import sys
 import traceback
 
 
@@ -73,14 +72,14 @@ def __translate_interp(interp, cygwin_path):
     """
     if not cygwin_path:
         return interp
-    m = re.match("^.*/([^ ]+)( .*)?", interp)
+    m = re.match("^[^ ]*/([^ ]+)( .*)?", interp)
     if m:
         cmd = os.path.join(cygwin_path, m.group(1))
         return cmd + m.group(2)
     return interp
 
 
-def get_script_interp(scriptpath, cygwin_path=None):
+def get_script_interp(script_path, cygwin_path=None):
     """Gets #!-interpreter command line from the script.
 
     It also fixes command path.  When Cygwin Python is used, e.g. in WebKit,
@@ -89,12 +88,12 @@ def get_script_interp(scriptpath, cygwin_path=None):
     "/usr/bin/perl" to "<cygwin_path>\perl.exe".
 
     Args:
-      scriptpath: pathname of the script
+      script_path: pathname of the script
       cygwin_path: directory name of cygwin binary, or None
     Returns:
       #!-interpreter command line, or None if it is not #!-script.
     """
-    fp = open(scriptpath)
+    fp = open(script_path)
     line = fp.readline()
     fp.close()
     m = re.match("^#!(.*)", line)

@@ -101,7 +101,7 @@ def get_script_interp(script_path, cygwin_path=None):
         return __translate_interp(m.group(1), cygwin_path)
     return None
 
-def wrap_popen3(cygwin_path):
+def wrap_popen3_for_win(cygwin_path):
     """Wrap popen3 to support #!-script on Windows.
 
     Args:

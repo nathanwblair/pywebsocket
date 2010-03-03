@@ -61,7 +61,8 @@ def prepend_message_to_exception(message, exc):
 
 def __translate_interp(interp, cygwin_path):
     """Translate interp program path for Win32 python to run cygwin program
-    (e.g. perl).
+    (e.g. perl).  Note that it doesn't support path that contains space,
+    which is typically true for Unix, where #!-script is written.
     For Win32 python, cygwin_path is a directory of cygwin binaries.
 
     Args:
@@ -94,7 +95,7 @@ def get_script_interp(scriptpath, cygwin_path=None):
       #!-interpreter command line, or None if it is not #!-script.
     """
     fp = open(scriptpath)
-    line = fp.read()
+    line = fp.readline()
     fp.close()
     m = re.match("^#!(.*)", line)
     if m:

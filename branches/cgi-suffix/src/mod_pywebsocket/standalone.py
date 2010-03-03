@@ -403,11 +403,11 @@ def _main():
             options.cgi_paths.split(',')
         if sys.platform in ('cygwin', 'win32'):
             cygwin_path = None
-            # For Win32 Python, e.g. Chromium, it is expected that CYGWIN_PATH
+            # For Win32 Python, it is expected that CYGWIN_PATH
             # is set to a directory of cygwin binaries.
             # For example, websocket_server.py in Chromium sets CYGWIN_PATH to
             # full path of third_party/cygwin/bin.
-            if not 'CYGWIN_PATH' in os.environ:
+            if 'CYGWIN_PATH' in os.environ:
                 cygwin_path = os.environ['CYGWIN_PATH']
             util.wrap_popen3_for_win(cygwin_path)
             def __check_script(scriptpath):

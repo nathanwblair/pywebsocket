@@ -73,53 +73,6 @@ import re
 import socket
 import sys
 
-if sys.platform in ('cygwin', 'win32'):
-    # Support #!-script mechanism on Windows.
-    # Note that WebKit runs this with Cygwin Python and Chromium runs this
-    # with Win32 Python.
-    # Cygwin Python can run /usr/bin/perl as command, but Win32 can't.
-    def __translate_interp(interp):
-        """translate interp program path for Win32 python to run cygwin program
-        (e.g. perl)"""
-        if sys.platform == 'cygwin':
-            return interp
-        # In Chromium, websocket_server.py sets CYGWIN_PATH to
-        # third_party/cygwin/bin, so it would run a script of
-        # "#!/usr/bin/perl" using third_party/cygwin/bin/perl.exe
-        if not 'CYGWIN_PATH' in os.environ:
-            return interp
-        m = re.match("^.*/([^ ]+)( .*)?", interp)
-        if m:
-            cmd = os.path.join(os.environ['CYGWIN_PATH'], m.group(1))
-            return cmd + m.group(2)
-        return interp
-
-    def __get_interp(scriptpath):
-        """Gets #!-interpreter command line from the script."""
-        fp = open(scriptpath)
-        line = fp.read()
-        fp.close()
-        m = re.match("^#!(.*)", line)
-        if m:
-            return __translate_interp(m.group(1))
-        return None
-
-    __orig_popen3 = os.popen3
-    def __wrap_popen3(cmd, mode='t', bufsize=-1):
-        """Wrap popen3 for Windows to handle #!-script."""
-        cmdline = cmd.split(' ')
-        interp = __get_interp(cmdline[0])
-        if interp:
-            cmd = interp + " " + cmd
-        return __orig_popen3(cmd, mode, bufsize)
-    os.popen3 = __wrap_popen3
-
-    def __check_script(path):
-        """Returns true if path is #!-script."""
-        return __get_interp(path)
-    CGIHTTPServer.executable = __check_script
-
-
 _HAS_OPEN_SSL = False
 try:
     import OpenSSL.SSL
@@ -448,6 +401,18 @@ def _main():
     if options.cgi_paths:
         CGIHTTPServer.CGIHTTPRequestHandler.cgi_directories = \
             options.cgi_paths.split(',')
+        if sys.platform in ('cygwin', 'win32'):
+            cygwin_path = None
+            # For Win32 Python, e.g. Chromium, it is expected that CYGWIN_PATH
+            # is set to a directory of cygwin binaries.
+            # For example, websocket_server.py in Chromium sets CYGWIN_PATH to
+            # full path of third_party/cygwin/bin.
+            if not 'CYGWIN_PATH' in os.environ:
+                cygwin_path = os.environ['CYGWIN_PATH']
+            util.wrap_popen3_for_win(cygwin_path)
+            def __check_script(scriptpath):
+                return util.get_script_interp(scriptpath, cygwin_path)
+            CGIHTTPServer.executable = __check_script
 
     if options.use_tls:
         if not _HAS_OPEN_SSL:

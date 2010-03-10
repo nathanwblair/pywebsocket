@@ -28,7 +28,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-"""Web Socket handshaking in draft-hixie-thewebsocketprotocol-75 protocol.
+"""Web Socket handshaking defined in draft-hixie-thewebsocketprotocol-75.
 
 Note: request.connection.write/read are used in this module, even though
 mod_python document says that they should be used only in connection handlers.

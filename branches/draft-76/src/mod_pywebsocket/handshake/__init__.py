@@ -37,11 +37,11 @@ not suitable because they don't allow direct raw bytes writing/reading.
 """
 
 
+import logging
 import re
 
 import draft75
 import handshake
-import logging
 from _base import HandshakeError
 from _base import validate_protocol
 
@@ -81,7 +81,7 @@ class Handshaker(object):
         except HandshakeError, e:
             logging.info('Handshake error: %s' % e)
             if self._fallbackHandshaker:
-                logging.info('fallback old protocol')
+                logging.info('fallback to old protocol')
                 self._fallbackHandshaker.do_handshake()
                 return
             raise e

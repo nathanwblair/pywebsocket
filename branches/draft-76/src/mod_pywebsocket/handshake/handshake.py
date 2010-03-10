@@ -37,9 +37,9 @@ not suitable because they don't allow direct raw bytes writing/reading.
 """
 
 
+from md5 import md5
 import re
 import struct
-from md5 import md5
 
 from _base import HandshakeError, build_location, validate_protocol
 
@@ -125,7 +125,7 @@ class Handshaker(object):
             digit = int(re.subn("\\D", "", key_field)[0])
             # number of spaces characters in the value.
             num_spaces = re.subn(" ", "", key_field)[1]
-            return digit/num_spaces
+            return digit / num_spaces
         except:
             return None
 

@@ -283,7 +283,7 @@ _BAD_REQUESTS = (
 
 def _create_request(request_def):
     data = ''
-    if len(request_def) >= 4:
+    if len(request_def) > 4:
         data = request_def[4]
     conn = mock.MockConn(data)
     conn.local_addr = ('0.0.0.0', request_def[0])
@@ -392,7 +392,7 @@ class HandshakerTest(unittest.TestCase):
                          request.headers_in['EmptyValue'])
 
     def test_bad_requests(self):
-        for request in map(_create_request, [_BAD_REQUESTS[1]]):
+        for request in map(_create_request, _BAD_REQUESTS):
             handshaker = handshake.Handshaker(request,
                                               mock.MockDispatcher())
             self.assertRaises(handshake.HandshakeError, handshaker.do_handshake)

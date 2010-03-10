@@ -385,7 +385,7 @@ def _main():
     parser.add_option('--log-count', '--log_count', dest='log_count',
                       type='int', default=_DEFAULT_LOG_BACKUP_COUNT,
                       help='Log backup count')
-    parser.add_option('--alllow-draft75', dest='allow_draft75',
+    parser.add_option('--allow-draft75', dest='allow_draft75',
                       action='store_true', default=False,
                       help='Allow draft 75 handshake')
     parser.add_option('--strict', dest='strict', action='store_true',

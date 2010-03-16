@@ -85,7 +85,7 @@ def _origin_header(origin):
     return 'Origin: %s\r\n' % origin
 
 def _hexify(s):
-    return re.subn(".", lambda x: "%02x " % ord(x.group(0)), s)[0]
+    return re.sub(".", lambda x: "%02x " % ord(x.group(0)), s)
 
 
 class _TLSSocket(object):

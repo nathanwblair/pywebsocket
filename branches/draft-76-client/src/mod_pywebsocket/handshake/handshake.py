@@ -52,7 +52,7 @@ _MANDATORY_HEADERS = [
 ]
 
 def _hexify(s):
-    return re.subn('.', lambda x: '%02x ' % ord(x.group(0)), s)[0]
+    return re.sub('.', lambda x: '%02x ' % ord(x.group(0)), s)
 
 class Handshaker(object):
     """This class performs Web Socket handshake."""
@@ -128,7 +128,7 @@ class Handshaker(object):
             return None
         try:
             # take the digits from the value to obtain a number
-            digit = int(re.subn("\\D", "", key_field)[0])
+            digit = int(re.sub("\\D", "", key_field))
             # number of spaces characters in the value.
             num_spaces = re.subn(" ", "", key_field)[1]
             logging.debug("%s: %d / %d => %d" % (

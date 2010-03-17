@@ -77,6 +77,7 @@ class ApacheLogHandler(logging.Handler):
             apache_level = ApacheLogHandler._LEVELS[record.levelno]
         self.log_error(record.getMessage(), apache_level)
 
+
 logging.getLogger("mod_pywebsocket").addHandler(ApacheLogHandler())
 
 
@@ -117,12 +118,12 @@ def headerparserhandler(request):
         request.log_error('mod_pywebsocket: resource: %r' % request.ws_resource,
                           apache.APLOG_DEBUG)
         try:
-             _dispatcher.transfer_data(request)
+            _dispatcher.transfer_data(request)
         except Exception, e:
-             # Catch exception in transfer_data.
-             # In this case, handshake has been successful, so just log the
-             # exception and return apache.DONE
-             request.log_error('mod_pywebsocket: %s' % e, apache.APLOG_WARNING)
+            # Catch exception in transfer_data.
+            # In this case, handshake has been successful, so just log the
+            # exception and return apache.DONE
+            request.log_error('mod_pywebsocket: %s' % e, apache.APLOG_WARNING)
     except handshake.HandshakeError, e:
         # Handshake for ws/wss failed.
         # But the request can be valid http/https request.

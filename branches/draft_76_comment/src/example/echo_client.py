@@ -147,7 +147,7 @@ class WebSocketHandshake(object):
         # 4.1 24. For each string in /fields/, in a random order: send the
         # string, encoded as UTF-8, followed by a UTF-8 encoded U+000D CARRIAGE
         # RETURN U+000A LINE FEED character pair (CRLF).
-        fields.sort(cmp=lambda _i, _j: random.randint(-1, 1))
+        random.shuffle(fields)
         for field in fields:
             self._socket.send(field)
         # 4.1 25. send a UTF-8-encoded U+000D CARRIAGE RETURN U+000A LINE FEED
@@ -160,7 +160,7 @@ class WebSocketHandshake(object):
         self._socket.send(self._key3)
         logging.info("%s" % _hexify(self._key3))
 
-        # 4.1.28. Read bytes from the server until either the connection closes,
+        # 4.1 28. Read bytes from the server until either the connection closes,
         # or a 0x0A byte is read. let /field/ be these bytes, including the 0x0A
         # bytes.
         field = ""
@@ -252,7 +252,7 @@ class WebSocketHandshake(object):
         if expected != reply:
             raise Exception('challenge/response failed: %s != %s' % (
                 expected, reply))
-        # 4.1 46. The *WebSocket connection is established.*.
+        # 4.1 46. The *WebSocket connection is established*.
 
     def _generate_sec_websocket_key(self):
         # 4.1 16. let /spaces_n/ be a random integer from 1 to 12 inclusive.

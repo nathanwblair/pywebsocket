@@ -133,7 +133,7 @@ class WebSocketHandshake(object):
         fields.append(WebSocketHandshake._CONNECTION_HEADER)
         # 4.1 9-12. Add Host: field to /fields/.
         fields.append(self._format_host_header())
-        # 4.1 13 Add Origin: field to /fields/.
+        # 4.1 13. Add Origin: field to /fields/.
         fields.append(_origin_header(self._options.origin))
         # TODO: 4.1 14 Add Sec-WebSocket-Protocol: field to /fields/.
         # TODO: 4.1 15 Add cookie headers to /fields/.
@@ -255,32 +255,33 @@ class WebSocketHandshake(object):
         # 4.1 46. The *WebSocket connection is established.*.
 
     def _generate_sec_websocket_key(self):
-        # 4.1 16 let /spaces_n/ be a random integer from 1 to 12 inclusive.
+        # 4.1 16. let /spaces_n/ be a random integer from 1 to 12 inclusive.
         spaces = random.randint(1, 12)
-        # 4.1 17 let /max_n/ be the largest integer not greater than
+        # 4.1 17. let /max_n/ be the largest integer not greater than
         #  4,294,967,295 divided by /spaces_n/.
         maxnum = 4294967295 / spaces
-        # 4.1 18 let /number_n/ be a random integer from 0 to /max_n/ inclusive.
+        # 4.1 18. let /number_n/ be a random integer from 0 to /max_n/
+        # inclusive.
         number = random.randint(0, maxnum)
-        # 4.1 19 let /product_n/ be the result of multiplying /number_n/ and
+        # 4.1 19. let /product_n/ be the result of multiplying /number_n/ and
         # /spaces_n/ together.
         product = number * spaces
-        # 4.1 20 let /key_n/ be a string consisting of /product_n/, expressed
+        # 4.1 20. let /key_n/ be a string consisting of /product_n/, expressed
         # in base ten using the numerals in the range U+0030 DIGIT ZERO (0) to
         # U+0039 DIGIT NINE (9).
         key = str(product)
-        # 4.1 21 insert /spaces_n/ U+0020 SPACE characters into /key_n/ at
+        # 4.1 21. insert /spaces_n/ U+0020 SPACE characters into /key_n/ at
         # random positions.
         for _ in range(spaces):
             pos = random.randint(1, len(key) - 1)
             key = key[0:pos] + ' ' + key[pos:]
-        # 4.1 22 insert between one and twelve random characters from the
+        # 4.1 22. insert between one and twelve random characters from the
         # range U+0021 to U+002F and U+003A to U+007E into /key_n/ at random
         # positions.
-        available_chars = range(0x21, 0x2f) + range(0x3a, 0x7e)
+        available_chars = range(0x21, 0x2f + 1) + range(0x3a, 0x7e + 1)
         n = random.randint(1, 12)
         for _ in range(n):
-            ch = available_chars[random.randint(0, len(available_chars) - 1)]
+            ch = random.choice(available_chars)
             pos = random.randint(0, len(key))
             key = key[0:pos] + chr(ch) + key[pos:]
         return number, key
@@ -288,10 +289,7 @@ class WebSocketHandshake(object):
     def _generate_key3(self):
         # 4.1 26. let /key3/ be a string consisting of eight random bytes (or
         # equivalently, a random 64 bit integer encoded in a big-endian order).
-        key3 = ""
-        for _ in range(8):
-            key3 += chr(random.randint(0, 255))
-        return key3
+        return ''.join([chr(random.randint(0, 255)) for _ in xrange(8)])
 
     def _read_fields(self):
         # 4.1 32. let /fields/ be a list of name-value pairs, initially empty.

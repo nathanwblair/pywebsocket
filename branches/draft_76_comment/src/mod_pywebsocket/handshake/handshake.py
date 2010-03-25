@@ -88,7 +88,7 @@ class Handshaker(object):
 
     def _check_header_lines(self):
         # 5.1 1. The three character UTF-8 string "GET".
-        # 5.1 2.  A UTF-8-encoded U+0020 SPACE character (0x20 byte).
+        # 5.1 2. A UTF-8-encoded U+0020 SPACE character (0x20 byte).
         if self._request.method != 'GET':
             raise HandshakeError('Method is not GET')
         # The expected field names, and the meaning of their corresponding
@@ -157,7 +157,7 @@ class Handshaker(object):
                 raise handshakeError('key_number %d is not an integral '
                                      'multiple of spaces %d' % (key_number,
                                                                 spaces))
-            # 5.2 7. let /part_n/ be /key_number_n/ divied by /spaces_n/.
+            # 5.2 7. let /part_n/ be /key_number_n/ divided by /spaces_n/.
             part = key_number / spaces
             self._logger.debug("%s: %s => %d / %d => %d" % (
                 key_field, key_value, key_number, spaces, part))
@@ -175,8 +175,8 @@ class Handshaker(object):
             raise HandshakeError('Sec-WebSocket-Key2 not found')
         # 5.2 8. let /challenge/ be the concatenation of /part_1/,
         challenge = ""
-        challenge += struct.pack("!I", key1) # network byteorder int
-        challenge += struct.pack("!I", key2) # network byteorder int
+        challenge += struct.pack("!I", key1)  # network byteorder int
+        challenge += struct.pack("!I", key2)  # network byteorder int
         challenge += self._request.connection.read(8)
         return challenge
 

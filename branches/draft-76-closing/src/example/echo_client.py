@@ -447,7 +447,7 @@ class EchoClient(object):
                     self._socket, self._options)
             self._handshake.handshake()
 
-            for line in self._options.message.split(',') + [_GOODBYE_MESSAGE]:
+            for line in self._options.message.split(','):
                 frame = '\x00' + line.encode('utf-8') + '\xff'
                 self._socket.send(frame)
                 if self._options.verbose:
@@ -458,6 +458,19 @@ class EchoClient(object):
                 if self._options.verbose:
                     print 'Recv: %s' % received[1:-1].decode('utf-8',
                                                              'replace')
+            if not self._options.draft75:
+                closing = ''
+                try:
+                    if self._options.message.split(',')[-1] == _GOODBYE_MESSAGE:
+                        # requested server initiated closing handshake, so
+                        # expecting closing handshake message from server.
+                        closing = self._socket.recv(2)
+                except Exception, ex:
+                    print 'Exception: %s' % ex
+                finally:
+                    if closing != '\xff\x00':
+                        print 'Closing handshake'
+                        self._socket.send('\xff\x00')
         finally:
             self._socket.close()
 
@@ -476,8 +489,8 @@ def main():
     parser.add_option('-r', '--resource', dest='resource', type='string',
                       default='/echo', help='resource path')
     parser.add_option('-m', '--message', dest='message', type='string',
-                      help=('comma-separated messages to send excluding "%s" '
-                            'that is always sent at the end' %
+                      help=('comma-separated messages to send.'
+                           '%s will force close the connection from server.' %
                             _GOODBYE_MESSAGE))
     parser.add_option('-q', '--quiet', dest='verbose', action='store_false',
                       default=True, help='suppress messages')

@@ -468,6 +468,8 @@ class EchoClient(object):
                 except Exception, ex:
                     print 'Exception: %s' % ex
                 finally:
+                    # if server didn't initiate closing handshake, start
+                    # closing handshake from client.
                     if closing != '\xff\x00':
                         print 'Closing handshake'
                         self._socket.send('\xff\x00')
@@ -489,7 +491,7 @@ def main():
     parser.add_option('-r', '--resource', dest='resource', type='string',
                       default='/echo', help='resource path')
     parser.add_option('-m', '--message', dest='message', type='string',
-                      help=('comma-separated messages to send.'
+                      help=('comma-separated messages to send. '
                            '%s will force close the connection from server.' %
                             _GOODBYE_MESSAGE))
     parser.add_option('-q', '--quiet', dest='verbose', action='store_false',

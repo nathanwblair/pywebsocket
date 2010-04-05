@@ -459,11 +459,11 @@ class EchoClient(object):
                     print 'Recv: %s' % received[1:-1].decode('utf-8',
                                                              'replace')
             if not self._options.draft75:
-                self._closing_handshake()
+                self._do_closing_handshake()
         finally:
             self._socket.close()
 
-    def _closing_handshake(self):
+    def _do_closing_handshake(self):
         """Perform closing handshake."""
         closing = ''
         try:

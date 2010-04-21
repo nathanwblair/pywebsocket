@@ -34,6 +34,7 @@
 import config  # to fix sys.path.
 import os
 import signal
+import socket
 import subprocess
 import sys
 import unittest
@@ -48,14 +49,17 @@ class EndToEndTest(unittest.TestCase):
     self.echo_client_command = os.path.join(self.top_dir,
                                             'example', 'echo_client.py')
     self.document_root = os.path.join(self.top_dir, 'example')
-    self.test_port = 9876
+    s = socket.socket()
+    s.bind(('127.0.0.1', 0))
+    (_, self.test_port) = s.getsockname()
+    s.close()
 
   def _run_server(self, commandline):
-    return subprocess.Popen([sys.executable] + commandline)
+    return subprocess.Popen([sys.executable] + commandline, close_fds=True)
 
   def _kill_process(self, pid):
     if sys.platform in ('win32', 'cygwin'):
-      subprocess.call(('taskkill.exe', '/f', '/pid', str(pid)))
+      subprocess.call(('taskkill.exe', '/f', '/pid', str(pid)), close_fds=True)
     else:
       os.kill(pid, signal.SIGKILL)
 
@@ -121,7 +125,7 @@ class EndToEndTest(unittest.TestCase):
     finally:
       self._kill_process(server.pid)
 
-  def test_echo_server_close(self):
+  def test_echo_server_close_draft75(self):
     try:
       server = self._run_server(
           [self.standalone_command, '-p', str(self.test_port),

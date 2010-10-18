@@ -63,3 +63,7 @@ class Framer(object):
       payload unicode string in a WebSocket frame.
     """
     return msgutil.receive_message(self._request)
+
+  def close_connection(self):
+    """Closes a WebSocket connection."""
+    msgutil.close_connection(self._request)

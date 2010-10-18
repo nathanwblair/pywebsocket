@@ -35,6 +35,7 @@
 import os
 import re
 
+from mod_pywebsocket import framer
 from mod_pywebsocket import msgutil
 from mod_pywebsocket import util
 
@@ -201,6 +202,7 @@ class Dispatcher(object):
             try:
                 request.client_terminated = False
                 request.server_terminated = False
+                request.ws_framer = framer.Framer(request)
                 transfer_data_(request)
             except msgutil.ConnectionTerminatedException, e:
                 util.prepend_message_to_exception(

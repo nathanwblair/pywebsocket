@@ -1,4 +1,4 @@
-# Copyright 2009, Google Inc.
+# Copyright 2010, Google Inc.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,19 +28,38 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-_GOODBYE_MESSAGE = 'Goodbye'
+"""Framer of WebSocket protocol.
+"""
 
+from mod_pywebsocket import msgutil
 
-def web_socket_do_extra_handshake(request):
-    pass  # Always accept.
+class Framer(object):
+  """Framer WebSocket message.
 
+  This class provides abstract interface to build/parse WebSocket frames.
+  TODO(ukai): dispatch framing based on Sec-WebSocket-Draft.
+  """
 
-def web_socket_transfer_data(request):
-    while True:
-        line = request.ws_framer.receive_message()
-        request.ws_framer.send_message(line)
-        if line == _GOODBYE_MESSAGE:
-            return
+  def __init__(self, request):
+    """Construct an instance.
 
+    Args:
+      request: mod_python request.
+    """
+    self._request = request
 
-# vi:sts=4 sw=4 et
+  def send_message(self, message):
+    """Send message.
+
+    Args:
+      message: unicode string to send.
+    """
+    msgutil.send_message(self._request, message)
+
+  def receive_message(self):
+    """Receive a WebSocket frame and return its payload an unicode string.
+
+    Returns:
+      payload unicode string in a WebSocket frame.
+    """
+    return msgutil.receive_message(self._request)

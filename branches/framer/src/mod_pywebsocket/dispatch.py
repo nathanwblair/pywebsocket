@@ -35,7 +35,7 @@
 import os
 import re
 
-from mod_pywebsocket import framer
+from mod_pywebsocket import stream
 from mod_pywebsocket import msgutil
 from mod_pywebsocket import util
 
@@ -200,9 +200,7 @@ class Dispatcher(object):
         unused_do_extra_handshake, transfer_data_ = self._handler(request)
         try:
             try:
-                request.client_terminated = False
-                request.server_terminated = False
-                request.ws_framer = framer.Framer(request)
+                request.ws_stream = stream.Stream(request)
                 transfer_data_(request)
             except msgutil.ConnectionTerminatedException, e:
                 util.prepend_message_to_exception(

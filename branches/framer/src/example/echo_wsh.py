@@ -37,8 +37,8 @@ def web_socket_do_extra_handshake(request):
 
 def web_socket_transfer_data(request):
     while True:
-        line = request.ws_framer.receive_message()
-        request.ws_framer.send_message(line)
+        line = request.ws_stream.receive_message()
+        request.ws_stream.send_message(line)
         if line == _GOODBYE_MESSAGE:
             return
 

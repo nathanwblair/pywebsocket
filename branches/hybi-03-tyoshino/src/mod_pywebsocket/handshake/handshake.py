@@ -177,8 +177,8 @@ class Handshaker(object):
             raise HandshakeError('Sec-WebSocket-Key2 not found')
         # 5.2 8. let /challenge/ be the concatenation of /part_1/,
         challenge = ""
-        challenge += struct.pack('!I', key1)  # network byteorder int
-        challenge += struct.pack('!I', key2)  # network byteorder int
+        challenge += struct.pack("!I", key1)  # network byteorder int
+        challenge += struct.pack("!I", key2)  # network byteorder int
         challenge += self._request.connection.read(8)
         return challenge
 

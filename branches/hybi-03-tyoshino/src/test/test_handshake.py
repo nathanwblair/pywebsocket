@@ -33,6 +33,8 @@
 """Tests for handshake module."""
 
 
+from struct import pack
+
 import unittest
 
 import config  # This must be imported before mod_pywebsocket.
@@ -48,13 +50,13 @@ _GOOD_REQUEST = (
     {
         'Host':'example.com',
         'Connection':'Upgrade',
-        'Sec-WebSocket-Key2':'12998 5 Y3 1  .P00',
+        'Sec-WebSocket-Key2':'I1   0 o98L  x5 Pi44$:40 8',
         'Sec-WebSocket-Protocol':'sample',
         'Upgrade':'WebSocket',
-        'Sec-WebSocket-Key1':'4 @1  46546xW%0l 1 5',
+        'Sec-WebSocket-Key1':'280  8N 520 8 2[I0~',
         'Origin':'http://example.com',
     },
-    '^n:ds[4U'
+    pack(">BBBBBBBB", 84, 33, 230, 70, 62, 55, 240, 177)
 )
 
 _GOOD_RESPONSE_DEFAULT_PORT = (
@@ -65,7 +67,8 @@ _GOOD_RESPONSE_DEFAULT_PORT = (
     'Sec-WebSocket-Origin: http://example.com\r\n'
     'Sec-WebSocket-Protocol: sample\r\n'
     '\r\n'
-    '8jKS\'y:G*Co,Wxa-')
+    + pack(">BBBBBBBBBBBBBBBB", 57, 105, 201, 45, 134, 239, 253, 124, 51, 55, 83, 134, 162, 108, 234, 212))
+#    '8jKS\'y:G*Co,Wxa-')
 
 _GOOD_RESPONSE_SECURE = (
     'HTTP/1.1 101 WebSocket Protocol Handshake\r\n'

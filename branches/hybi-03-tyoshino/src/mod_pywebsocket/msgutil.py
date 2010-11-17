@@ -52,11 +52,13 @@ class ConnectionTerminatedException(MsgUtilException):
 
 
 def _read(request, length):
-    bytes = request.connection.read(length)
-    if not bytes:
-        raise MsgUtilException(
-                'Failed to receive message from %r' %
-                        (request.connection.remote_addr,))
+    bytes = b''
+    while length > 0:
+        new_data = request.connection.read(length)
+        if not new_data:
+            break
+        bytes += new_data
+        length -= len(new_data)
     return bytes
 
 

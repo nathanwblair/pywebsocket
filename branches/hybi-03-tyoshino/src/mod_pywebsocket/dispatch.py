@@ -36,6 +36,7 @@ import os
 import re
 
 from mod_pywebsocket import stream
+from mod_pywebsocket import stream_hixie75
 from mod_pywebsocket import msgutil
 from mod_pywebsocket import util
 
@@ -200,7 +201,13 @@ class Dispatcher(object):
         unused_do_extra_handshake, transfer_data_ = self._handler(request)
         try:
             try:
-                request.ws_stream = stream.Stream(request)
+                draft = request.headers_in.get('Sec-WebSocket-Draft')
+                if (draft is not None and len(draft) > 0 and int(draft) >= 1):
+                    print 'Use IETF HyBi 01 framing'
+                    request.ws_stream = stream.Stream(request)
+                else:
+                    print 'Use Hixie 75 framing'
+                    request.ws_stream = stream_hixie75.StreamHixie75(request)
                 transfer_data_(request)
             except msgutil.ConnectionTerminatedException, e:
                 util.prepend_message_to_exception(
@@ -209,7 +216,7 @@ class Dispatcher(object):
                     e)
                 raise
             except Exception, e:
-                print 'exception: %s' % type(e)
+                print 'exception: %s' % e
                 util.prepend_message_to_exception(
                     '%s raised exception for %s: ' % (
                     _TRANSFER_DATA_HANDLER_NAME, request.ws_resource),

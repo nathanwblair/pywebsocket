@@ -108,7 +108,40 @@ class EndToEndTest(unittest.TestCase):
     finally:
       self._kill_process(server.pid)
 
-  def test_echo_draft75(self):
+  def test_echo_hybi00(self):
+    try:
+      server = self._run_server(
+          [self.standalone_command, '-p', str(self.test_port),
+           '-d', self.document_root])
+      client = self._run_client(
+          [self.echo_client_command, '-p', str(self.test_port),
+           '-s', 'localhost', '-o', 'http://localhost',
+           '-r', '/echo', '-m', 'test',
+           '--hybi00'])
+      actual = self._get_client_output(client)
+      self.assertEqual('Send: test\nRecv: test\nClosing handshake\n', actual)
+      client.wait()
+    finally:
+      self._kill_process(server.pid)
+
+  def test_echo_server_close_hybi00(self):
+    try:
+      server = self._run_server(
+          [self.standalone_command, '-p', str(self.test_port),
+           '-d', self.document_root])
+      client = self._run_client(
+          [self.echo_client_command, '-p', str(self.test_port),
+           '-s', 'localhost', '-o', 'http://localhost',
+           '-r', '/echo', '-m', 'test,Goodbye',
+           '--hybi00'])
+      actual = self._get_client_output(client)
+      self.assertEqual('Send: test\nRecv: test\n'
+                       'Send: Goodbye\nRecv: Goodbye\n', actual)
+      client.wait()
+    finally:
+      self._kill_process(server.pid)
+
+  def test_echo_hixie75(self):
     try:
       server = self._run_server(
           [self.standalone_command, '-p', str(self.test_port),
@@ -118,14 +151,14 @@ class EndToEndTest(unittest.TestCase):
           [self.echo_client_command, '-p', str(self.test_port),
            '-s', 'localhost', '-o', 'http://localhost',
            '-r', '/echo', '-m', 'test',
-           '--draft75'])
+           '--hixie75'])
       actual = self._get_client_output(client)
       self.assertEqual('Send: test\nRecv: test\n', actual)
       client.wait()
     finally:
       self._kill_process(server.pid)
 
-  def test_echo_server_close_draft75(self):
+  def test_echo_server_close_hixie75(self):
     try:
       server = self._run_server(
           [self.standalone_command, '-p', str(self.test_port),
@@ -135,7 +168,7 @@ class EndToEndTest(unittest.TestCase):
           [self.echo_client_command, '-p', str(self.test_port),
            '-s', 'localhost', '-o', 'http://localhost',
            '-r', '/echo', '-m', 'test,Goodbye',
-           '--draft75'])
+           '--hixie75'])
       actual = self._get_client_output(client)
       self.assertEqual('Send: test\nRecv: test\n'
                        'Send: Goodbye\nRecv: Goodbye\n', actual)

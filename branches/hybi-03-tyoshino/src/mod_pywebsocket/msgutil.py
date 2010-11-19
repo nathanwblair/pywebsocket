@@ -51,17 +51,6 @@ class ConnectionTerminatedException(MsgUtilException):
     pass
 
 
-def _read(request, length):
-    bytes = b''
-    while length > 0:
-        new_data = request.connection.read(length)
-        if not new_data:
-            break
-        bytes += new_data
-        length -= len(new_data)
-    return bytes
-
-
 def _write(request, bytes):
     try:
         request.connection.write(bytes)
@@ -108,8 +97,10 @@ def receive_message(request):
 def _payload_length(request):
     length = 0
     while True:
-        b_str = _read(request, 1)
-        b = ord(b_str[0])
+        b_str = request.connection.read(1)
+        if not b_str:
+            raise Exception('connection closed unexpectedly')
+        b = ord(b_str)
         length = length * 128 + (b & 0x7f)
         if (b & 0x80) == 0:
             break
@@ -117,9 +108,18 @@ def _payload_length(request):
 
 
 def _receive_bytes(request, length):
+    """Receives multiple bytes. Retries read when we couldn't receive the
+    specified amount.
+
+    Raises:
+        ConnectionTerminatedException: when read returns empty string.
+    """
+
     bytes = []
     while length > 0:
-        new_bytes = _read(request, length)
+        new_bytes = request.connection.read(length)
+        if not new_bytes:
+            raise Exception('connection closed unexpectedly')
         bytes.append(new_bytes)
         length -= len(new_bytes)
     return ''.join(bytes)
@@ -128,9 +128,11 @@ def _receive_bytes(request, length):
 def _read_until(request, delim_char):
     bytes = []
     while True:
-        ch = _read(request, 1)
+        ch = request.connection.read(1)
         if ch == delim_char:
             break
+        elif not ch:
+            raise Exception('connection closed unexpectedly')
         bytes.append(ch)
     return ''.join(bytes)
 

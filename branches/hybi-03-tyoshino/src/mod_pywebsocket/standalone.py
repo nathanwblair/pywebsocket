@@ -72,6 +72,7 @@ import os
 import re
 import socket
 import sys
+import traceback
 
 _HAS_OPEN_SSL = False
 try:
@@ -100,6 +101,7 @@ _DEFAULT_REQUEST_QUEUE_SIZE = 128
 
 # 1024 is practically large enough to contain WebSocket handshake lines.
 _MAX_MEMORIZED_LINES = 1024
+
 
 def _print_warnings_if_any(dispatcher):
     warnings = dispatcher.source_warnings()
@@ -140,6 +142,10 @@ class _StandaloneConnection(object):
     def read(self, length):
         """Mimic mp_conn.read()."""
         return self._request_handler.rfile.read(length)
+
+    def close(self):
+        """Mimic mp_conn.close()."""
+        self._request_handler.wfile.close()
 
     def get_memorized_lines(self):
         """Get memorized lines."""
@@ -259,6 +265,7 @@ class WebSocketRequestHandler(CGIHTTPServer.CGIHTTPRequestHandler):
                     # In this case, handshake has been successful, so just log
                     # the exception and return False.
                     logging.info('mod_pywebsocket: %s' % e)
+                    logging.info('mod_pywebsocket: %s' % util.get_stack_trace())
                 return False
             except handshake.HandshakeError, e:
                 # Handshake for ws(s) failed. Assume http(s).
@@ -322,6 +329,7 @@ def _configure_logging(options):
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
+
 def _alias_handlers(dispatcher, websock_handlers_map_file):
     """Set aliases specified in websock_handler_map_file in dispatcher.
 
@@ -345,7 +353,6 @@ def _alias_handlers(dispatcher, websock_handlers_map_file):
                 logging.error(str(e))
     finally:
         fp.close()
-
 
 
 def _main():
@@ -462,7 +469,8 @@ def _main():
                                  WebSocketRequestHandler)
         server.serve_forever()
     except Exception, e:
-        logging.critical(str(e))
+        logging.critical('mod_pywebsocket: %s' % e)
+        logging.critical('mod_pywebsocket: %s' % util.get_stack_trace())
         sys.exit(1)
 
 

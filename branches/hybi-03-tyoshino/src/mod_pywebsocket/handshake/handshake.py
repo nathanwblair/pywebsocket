@@ -53,8 +53,10 @@ _MANDATORY_HEADERS = [
     ['Connection', 'Upgrade'],
 ]
 
+
 def _hexify(s):
     return re.sub('.', lambda x: '%02x ' % ord(x.group(0)), s)
+
 
 class Handshaker(object):
     """This class performs Web Socket handshake."""
@@ -153,7 +155,8 @@ class Handshaker(object):
             # 5.2 5. let /spaces_n/ be the number of U+0020 SPACE characters
             # in /key_n/.
             spaces = re.subn(" ", "", key_value)[1]
-            # 5.2 6. if /key-number_n/ is not an integral multiple of /spaces_n/
+            # 5.2 6. if /key-number_n/ is not an integral multiple of
+            # /spaces_n/
             # then abort the WebSocket connection.
             if key_number % spaces != 0:
                 raise handshakeError('key_number %d is not an integral '

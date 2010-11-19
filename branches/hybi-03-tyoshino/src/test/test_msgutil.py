@@ -72,60 +72,60 @@ class MessageTest(unittest.TestCase):
     def test_send_message(self):
         request = _create_request('')
         msgutil.send_message(request, 'Hello')
-        self.assertEqual(b'\x04\x05Hello', request.connection.written_data())
+        self.assertEqual('\x04\x05Hello', request.connection.written_data())
 
     def test_send_medium_message(self):
-        payload = b'a' * 126
+        payload = 'a' * 126
         request = _create_request('')
         msgutil.send_message(request, payload)
-        self.assertEqual(b'\x04\x7e\x00\x7e' + payload,
+        self.assertEqual('\x04\x7e\x00\x7e' + payload,
                          request.connection.written_data())
 
     def test_send_large_message(self):
-        payload = b'a' * (1 << 16)
+        payload = 'a' * (1 << 16)
         request = _create_request('')
         msgutil.send_message(request, payload)
-        self.assertEqual(b'\x04\x7f\x00\x00\x00\x00\x00\x01\x00\x00' + payload,
+        self.assertEqual('\x04\x7f\x00\x00\x00\x00\x00\x01\x00\x00' + payload,
                          request.connection.written_data())
 
     def test_send_message_unicode(self):
         request = _create_request('')
         msgutil.send_message(request, u'\u65e5')
         # U+65e5 is encoded as e6,97,a5 in UTF-8
-        self.assertEqual(b'\x04\x03\xe6\x97\xa5',
+        self.assertEqual('\x04\x03\xe6\x97\xa5',
                          request.connection.written_data())
 
     def test_receive_message(self):
-        request = _create_request(b'\x04\x05Hello\x04\x06World!')
+        request = _create_request('\x04\x05Hello\x04\x06World!')
         self.assertEqual('Hello', msgutil.receive_message(request))
         self.assertEqual('World!', msgutil.receive_message(request))
 
     def test_receive_medium_message(self):
-        payload = b'a' * 126
-        request = _create_request(b'\x04\x7e\x00\x7e' + payload)
+        payload = 'a' * 126
+        request = _create_request('\x04\x7e\x00\x7e' + payload)
         self.assertEqual(payload, msgutil.receive_message(request))
 
     def test_receive_large_message(self):
-        payload = b'a' * (1 << 16)
-        request = _create_request(b'\x04\x7f\x00\x00\x00\x00\x00\x01\x00\x00'
+        payload = 'a' * (1 << 16)
+        request = _create_request('\x04\x7f\x00\x00\x00\x00\x00\x01\x00\x00'
                                   + payload)
         self.assertEqual(payload, msgutil.receive_message(request))
 
     def test_receive_message_unicode(self):
-        request = _create_request(b'\x04\x03\xe6\x9c\xac')
+        request = _create_request('\x04\x03\xe6\x9c\xac')
         # U+672c is encoded as e6,9c,ac in UTF-8
         self.assertEqual(u'\u672c', msgutil.receive_message(request))
 
     def test_receive_message_erroneous_unicode(self):
         # \x80 and \x81 are invalid as UTF-8.
-        request = _create_request(b'\x04\x02\x80\x81')
+        request = _create_request('\x04\x02\x80\x81')
         # Invalid characters should be replaced with
         # U+fffd REPLACEMENT CHARACTER
         self.assertEqual(u'\ufffd\ufffd', msgutil.receive_message(request))
 
     def test_receive_message_discard(self):
-        request = _create_request(b'\x05\x06IGNORE\x04\x05Hello'
-                                  b'\x05\x09DISREGARD\x04\x06World!')
+        request = _create_request('\x05\x06IGNORE\x04\x05Hello'
+                                  '\x05\x09DISREGARD\x04\x06World!')
         self.assertEqual('Hello', msgutil.receive_message(request))
         self.assertEqual('World!', msgutil.receive_message(request))
 
@@ -169,18 +169,9 @@ class MessageTestHixie75(unittest.TestCase):
     def test_payload_length(self):
         for length, bytes in ((0, '\x00'), (0x7f, '\x7f'), (0x80, '\x81\x00'),
                               (0x1234, '\x80\xa4\x34')):
-            self.assertEqual(length,
-                             msgutil._payload_length(_create_request_hixie75(bytes)))
-
-    def test_receive_bytes(self):
-        request = _create_request_hixie75('abcdefg')
-        self.assertEqual('abc', msgutil._receive_bytes(request, 3))
-        self.assertEqual('defg', msgutil._receive_bytes(request, 4))
-
-    def test_read_until(self):
-        request = _create_request_hixie75('abcXdefgX')
-        self.assertEqual('abc', msgutil._read_until(request, 'X'))
-        self.assertEqual('defg', msgutil._read_until(request, 'X'))
+            self.assertEqual(
+                length,
+                msgutil._payload_length(_create_request_hixie75(bytes)))
 
 
 class MessageReceiverTest(unittest.TestCase):

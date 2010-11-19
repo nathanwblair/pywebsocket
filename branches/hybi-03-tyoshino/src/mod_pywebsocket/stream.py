@@ -49,16 +49,79 @@ class ConnectionTerminatedException(msgutil.ConnectionTerminatedException):
     pass
 
 
-class StreamException(Exception):
+class StreamException(RuntimeError):
     pass
 
 
-class Stream(object):
-    """Stream of WebSocket messages.
+def _create_length_header(length, rsv4):
+    header = ''
 
-    This class provides abstract interface to access WebSocket stream of frames.
-    TODO(ukai): dispatch framing based on Sec-WebSocket-Draft.
-    """
+    if length <= 125:
+        second_byte = rsv4 << 7 | length
+        header += chr(second_byte)
+    elif length < 1 << 16:
+        second_byte = rsv4 << 7 | 126
+        header += chr(second_byte) + struct.pack('!H', length)
+    elif length < 1 << 63:
+        second_byte = rsv4 << 7 | 127
+        header += chr(second_byte) + struct.pack('!Q', length)
+    else:
+        raise StreamException('Payload is too big for one frame')
+
+    return header
+
+
+def _create_header(opcode, payload_length, more, rsv1, rsv2, rsv3, rsv4):
+    header = ''
+
+    first_byte = (more << 7
+                  | rsv1 << 6 | rsv2 << 5 | rsv3 << 4
+                  | opcode)
+    header += chr(first_byte)
+    header += _create_length_header(payload_length, rsv4)
+
+    return header
+
+
+def _create_text_frame(message):
+    encoded_message = message.encode('utf-8')
+    frame = _create_header(_OPCODE_TEXT, len(encoded_message), 0, 0, 0, 0, 0)
+    frame += encoded_message
+    return frame
+
+
+def _receive_frame(request):
+    received = msgutil._receive_bytes(request, 2)
+
+    first_byte = ord(received[0])
+    more = first_byte >> 7 & 1
+    rsv1 = first_byte >> 6 & 1
+    rsv2 = first_byte >> 5 & 1
+    rsv3 = first_byte >> 4 & 1
+    opcode = first_byte & 0xf
+
+    second_byte = ord(received[1])
+    rsv4 = second_byte >> 7 & 1
+    payload_length = second_byte & 0x7f
+
+    if payload_length == 127:
+        extended_payload_length = msgutil._receive_bytes(request, 8)
+        payload_length = struct.unpack(
+            '!Q', extended_payload_length)[0]
+    elif payload_length == 126:
+        extended_payload_length = msgutil._receive_bytes(request, 2)
+        payload_length = struct.unpack(
+            '!H', extended_payload_length)[0]
+
+    bytes = msgutil._receive_bytes(request, payload_length)
+
+    return (opcode, bytes, more, rsv1, rsv2, rsv3, rsv4)
+
+
+class Stream(object):
+    """Stream of WebSocket messages."""
+
+    # TODO(tyoshino): Add fragment support
 
     def __init__(self, request):
         """Construct an instance.
@@ -70,7 +133,6 @@ class Stream(object):
         self._request.client_terminated = False
         self._request.server_terminated = False
 
-
     def send_message(self, message):
         """Send message.
 
@@ -80,31 +142,7 @@ class Stream(object):
         if self._request.server_terminated:
             raise ConnectionTerminatedException
 
-        header = b''
-
-        encoded_message = message.encode('utf-8')
-
-        more = 0
-        rsv1 = 0
-        rsv2 = 0
-        rsv3 = 0
-        first_byte = more << 7 | rsv1 << 6 | rsv2 << 5 | rsv3 << 4 | _OPCODE_TEXT
-        header += chr(first_byte)
-
-        rsv4 = 0
-        payload_length = len(encoded_message)
-        if payload_length <= 125:
-            second_byte = rsv4 << 7 | payload_length
-            header += chr(second_byte)
-        elif payload_length < 1 << 16:
-            second_byte = rsv4 << 7 | 126
-            header += chr(second_byte) + struct.pack('!H', payload_length)
-        elif payload_length < 1 << 63:
-            second_byte = rsv4 << 7 | 127
-            header += chr(second_byte) + struct.pack('!Q', payload_length)
-        else:
-            raise StreamException
-        msgutil._write(self._request, header + encoded_message)
+        msgutil._write(self._request, _create_text_frame(message))
 
     def receive_message(self):
         """Receive a WebSocket frame and return its payload an unicode string.
@@ -118,33 +156,16 @@ class Stream(object):
             # mp_conn.read will block if no bytes are available.
             # Timeout is controlled by TimeOut directive of Apache.
 
-            first_byte_str = msgutil._read(self._request, 1)
-            first_byte = ord(first_byte_str)
-            more = first_byte & 1 << 7
-            rsv1 = first_byte & 1 << 6
-            rsv2 = first_byte & 1 << 5
-            rsv3 = first_byte & 1 << 4
-            opcode = first_byte & 0xf
-
-            second_byte_str = msgutil._read(self._request, 1)
-            second_byte = ord(second_byte_str)
-            rsv4 = second_byte & 0x80
-            payload_length = second_byte & 0x7f
-
-            if payload_length == 127:
-                payload_length = struct.unpack('!Q', msgutil._read(self._request, 8))[0]
-            elif payload_length == 126:
-                payload_length = struct.unpack('!H', msgutil._read(self._request, 2))[0]
-
-            bytes = msgutil._receive_bytes(self._request, payload_length)
+            (opcode, bytes, _, _, _, _, _) = _receive_frame(self._request)
 
             if opcode == _OPCODE_TEXT:
                 # The Web Socket protocol section 4.4 specifies that invalid
-                # characters must be replaced with U+fffd REPLACEMENT CHARACTER.
+                # characters must be replaced with U+fffd REPLACEMENT
+                # CHARACTER.
                 message = bytes.decode('utf-8', 'replace')
                 return message
             elif opcode == _OPCODE_CLOSE:
-                self._requet.client_terminated = true
+                self._request.client_terminated = True
                 raise ConnectionTerminatedException
             # Discard data of other types.
 
@@ -154,12 +175,13 @@ class Stream(object):
             return
         # 5.3 the server may decide to terminate the WebSocket connection by
         # running through the following steps:
-        # 1. send a 0xFF byte and a 0x00 byte to the client to indicate the start
+        # 1. send a 0xFF byte and a 0x00 byte to the client to indicate the
+        # start
         # of the closing handshake.
-        msgutil._write(self._request, chr(_OPCODE_CLOSE) + b'\x00')
+        msgutil._write(self._request, chr(_OPCODE_CLOSE) + '\x00')
         self._request.server_terminated = True
-        # TODO(ukai): 2. wait until the /client terminated/ flag has been set, or
-        # until a server-defined timeout expires.
+        # TODO(ukai): 2. wait until the /client terminated/ flag has been set,
+        # or until a server-defined timeout expires.
         # TODO: 3. close the WebSocket connection.
         # note: mod_python Connection (mp_conn) doesn't have close method.
 

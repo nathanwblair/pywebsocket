@@ -143,10 +143,6 @@ class _StandaloneConnection(object):
         """Mimic mp_conn.read()."""
         return self._request_handler.rfile.read(length)
 
-    def close(self):
-        """Mimic mp_conn.close()."""
-        self._request_handler.wfile.close()
-
     def get_memorized_lines(self):
         """Get memorized lines."""
         return self._request_handler.rfile.get_memorized_lines()

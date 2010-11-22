@@ -37,6 +37,7 @@ import signal
 import socket
 import subprocess
 import sys
+import time
 import unittest
 
 
@@ -82,12 +83,14 @@ class EndToEndTest(unittest.TestCase):
       server = self._run_server(
           [self.standalone_command, '-p', str(self.test_port),
            '-d', self.document_root])
+      time.sleep(0.2)
       client = self._run_client(
           [self.echo_client_command, '-p', str(self.test_port),
            '-s', 'localhost', '-o', 'http://localhost',
            '-r', '/echo', '-m', 'test'])
       actual = self._get_client_output(client)
-      self.assertEqual('Send: test\nRecv: test\nClosing handshake\n', actual)
+      self.assertEqual('Send: test\nRecv: test\nSend close\nRecv ack\n'
+                       '', actual)
       client.wait()
     finally:
       self._kill_process(server.pid)
@@ -97,13 +100,15 @@ class EndToEndTest(unittest.TestCase):
       server = self._run_server(
           [self.standalone_command, '-p', str(self.test_port),
            '-d', self.document_root])
+      time.sleep(0.2)
       client = self._run_client(
           [self.echo_client_command, '-p', str(self.test_port),
            '-s', 'localhost', '-o', 'http://localhost',
            '-r', '/echo', '-m', 'test,Goodbye'])
       actual = self._get_client_output(client)
       self.assertEqual('Send: test\nRecv: test\n'
-                       'Send: Goodbye\nRecv: Goodbye\n', actual)
+                       'Send: Goodbye\nRecv: Goodbye\n'
+                       'Recv close\nSend ack\n', actual)
       client.wait()
     finally:
       self._kill_process(server.pid)
@@ -113,13 +118,14 @@ class EndToEndTest(unittest.TestCase):
       server = self._run_server(
           [self.standalone_command, '-p', str(self.test_port),
            '-d', self.document_root])
+      time.sleep(0.2)
       client = self._run_client(
           [self.echo_client_command, '-p', str(self.test_port),
            '-s', 'localhost', '-o', 'http://localhost',
            '-r', '/echo', '-m', 'test',
            '--protocol-version', 'hybi00'])
       actual = self._get_client_output(client)
-      self.assertEqual('Send: test\nRecv: test\nClosing handshake\n', actual)
+      self.assertEqual('Send: test\nRecv: test\nSend close\nRecv ack\n', actual)
       client.wait()
     finally:
       self._kill_process(server.pid)
@@ -129,6 +135,7 @@ class EndToEndTest(unittest.TestCase):
       server = self._run_server(
           [self.standalone_command, '-p', str(self.test_port),
            '-d', self.document_root])
+      time.sleep(0.2)
       client = self._run_client(
           [self.echo_client_command, '-p', str(self.test_port),
            '-s', 'localhost', '-o', 'http://localhost',
@@ -136,7 +143,8 @@ class EndToEndTest(unittest.TestCase):
            '--protocol-version', 'hybi00'])
       actual = self._get_client_output(client)
       self.assertEqual('Send: test\nRecv: test\n'
-                       'Send: Goodbye\nRecv: Goodbye\n', actual)
+                       'Send: Goodbye\nRecv: Goodbye\n'
+                       'Recv close\nSend ack\n', actual)
       client.wait()
     finally:
       self._kill_process(server.pid)
@@ -147,6 +155,7 @@ class EndToEndTest(unittest.TestCase):
           [self.standalone_command, '-p', str(self.test_port),
            '-d', self.document_root,
            '--allow-draft75'])
+      time.sleep(0.2)
       client = self._run_client(
           [self.echo_client_command, '-p', str(self.test_port),
            '-s', 'localhost', '-o', 'http://localhost',
@@ -164,6 +173,7 @@ class EndToEndTest(unittest.TestCase):
           [self.standalone_command, '-p', str(self.test_port),
            '-d', self.document_root,
            '--allow-draft75'])
+      time.sleep(0.2)
       client = self._run_client(
           [self.echo_client_command, '-p', str(self.test_port),
            '-s', 'localhost', '-o', 'http://localhost',

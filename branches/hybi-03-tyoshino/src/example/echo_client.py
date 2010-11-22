@@ -504,7 +504,7 @@ class EchoClient(object):
                 if self._options.message.split(',')[-1] == _GOODBYE_MESSAGE:
                     # requested server initiated closing handshake, so
                     # expecting closing handshake message from server.
-                    print 'Wait for server-initiated closing handshake'
+                    logging.info('Wait for server-initiated closing handshake')
                     closing = _receive_bytes(self._socket, len(closing_frame))
                     if closing == closing_frame:
                         # 4.2 3 8 If the /frame type/ is 0xFF and the
@@ -513,8 +513,11 @@ class EchoClient(object):
                         # 1. If the WebSocket closing handshake has not
                         # yet started, then start the WebSocket closing
                         # handshake.
+                        print 'Recv close'
                         self._socket.send(closing_frame)
-                        print 'Received closing handshake and sent acknowledge'
+                        print 'Send ack'
+                        logging.info(
+                            'Received closing handshake and sent ack')
                         # 2. Wait until either the WebSocket closing
                         # handshake has started or the WebSocket connection
                         # is closed.
@@ -529,7 +532,8 @@ class EchoClient(object):
             if closing != closing_frame:
                 # 2, 3 Send a 0xFF byte and 0x00 byte to the server.
                 self._socket.send(closing_frame)
-                print 'Started client-initiated closing handshake'
+                print 'Send close'
+                logging.info('Sent closing handshake')
                 # 4 The WebSocket closing handshake has started.
                 # 5 Wait a user-agent-determined length of time, or
                 # until the WebSocket connection is closed.
@@ -537,9 +541,10 @@ class EchoClient(object):
                 # returns the 0xFF package, as described above.
                 closing = _receive_bytes(self._socket, len(closing_frame))
                 if closing != closing_frame:
-                    print 'Didnt\'t receive acknowledgement'
+                    logging.info('Received no valid ack')
                 else:
-                    print 'Received acknowledgement for closing handshake'
+                    print 'Recv ack'
+                    logging.info('Received ack')
 
     def _create_handshake(self):
         return WebSocketHandshake(self._socket, self._options)

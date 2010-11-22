@@ -74,11 +74,23 @@ class MessageTest(unittest.TestCase):
         msgutil.send_message(request, 'Hello')
         self.assertEqual('\x04\x05Hello', request.connection.written_data())
 
+        payload = 'a' * 125
+        request = _create_request('')
+        msgutil.send_message(request, payload)
+        self.assertEqual('\x04\x7d' + payload,
+                         request.connection.written_data())
+
     def test_send_medium_message(self):
         payload = 'a' * 126
         request = _create_request('')
         msgutil.send_message(request, payload)
         self.assertEqual('\x04\x7e\x00\x7e' + payload,
+                         request.connection.written_data())
+
+        payload = 'a' * ((1 << 16) - 1)
+        request = _create_request('')
+        msgutil.send_message(request, payload)
+        self.assertEqual('\x04\x7e\xff\xff' + payload,
                          request.connection.written_data())
 
     def test_send_large_message(self):
@@ -100,9 +112,17 @@ class MessageTest(unittest.TestCase):
         self.assertEqual('Hello', msgutil.receive_message(request))
         self.assertEqual('World!', msgutil.receive_message(request))
 
+        payload = 'a' * 125
+        request = _create_request('\x04\x7d' + payload)
+        self.assertEqual(payload, msgutil.receive_message(request))
+
     def test_receive_medium_message(self):
         payload = 'a' * 126
         request = _create_request('\x04\x7e\x00\x7e' + payload)
+        self.assertEqual(payload, msgutil.receive_message(request))
+
+        payload = 'a' * ((1 << 16) - 1)
+        request = _create_request('\x04\x7e\xff\xff' + payload)
         self.assertEqual(payload, msgutil.receive_message(request))
 
     def test_receive_large_message(self):
@@ -174,16 +194,21 @@ class MessageTestHixie75(unittest.TestCase):
                 msgutil._payload_length(_create_request_hixie75(bytes)))
 
     def test_create_header(self):
-        # More, rsvN are all true
+        # more, rsv1, ..., rsv4 are all true
         header = msgutil.create_header(msgutil.OPCODE_TEXT, 1, 1, 1, 1, 1, 1)
         self.assertEqual('\xf4\x81', header)
+
+        # Maximum payload size
+        header = msgutil.create_header(
+            msgutil.OPCODE_TEXT, (1 << 63) - 1, 0, 0, 0, 0, 0)
+        self.assertEqual('\x04\x7f\x7f\xff\xff\xff\xff\xff\xff\xff', header)
 
         # Invalid opcode 0x10
         self.assertRaises(Exception,
                           msgutil.create_header,
                           0x10, 0, 0, 0, 0, 0, 0)
 
-        # Invalid value 0xf passed to rsv1
+        # Invalid value 0xf passed to more parameter
         self.assertRaises(Exception,
                           msgutil.create_header,
                           msgutil.OPCODE_TEXT, 0, 0xf, 0, 0, 0, 0)
@@ -296,5 +321,3 @@ if __name__ == '__main__':
 
 
 # vi:sts=4 sw=4 et
-
-#  LocalWords:  TestCase

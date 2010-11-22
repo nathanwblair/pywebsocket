@@ -44,18 +44,22 @@ import threading
 from mod_pywebsocket import util
 
 
-OPCODE_CONTINUATION = 0
-OPCODE_CLOSE = 1
-OPCODE_PING = 2
-OPCODE_PONG = 3
-OPCODE_TEXT = 4
-OPCODE_BINARY = 5
+# Frame opcodes defined in the spec
+OPCODE_CONTINUATION = 0x0
+OPCODE_CLOSE        = 0x1
+OPCODE_PING         = 0x2
+OPCODE_PONG         = 0x3
+OPCODE_TEXT         = 0x4
+OPCODE_BINARY       = 0x5
 
 
 class MsgUtilException(Exception):
     pass
 
 
+# TODO(tyoshino): This class is not used only for client initiated closing
+# handshake. Arrange exception definition and fix the code prepending
+# exception info in dispatch.py.
 class ConnectionTerminatedException(MsgUtilException):
     pass
 
@@ -138,10 +142,10 @@ def create_length_header(length, rsv4):
 def create_header(opcode, payload_length, more, rsv1, rsv2, rsv3, rsv4):
     """Creates a frame header."""
 
-    if (opcode < 0) or (0xf < opcode):
+    if opcode < 0 or 0xf < opcode:
         raise Exception('Opcode out of range')
 
-    if (payload_length < 0) or (1 << 63 <= payload_length):
+    if payload_length < 0 or 1 << 63 <= payload_length:
         raise Exception('payload_length out of range')
 
     if (more | rsv1 | rsv2 | rsv3 | rsv4) & ~1:

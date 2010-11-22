@@ -74,7 +74,7 @@ class StreamHixie75(object):
             # Read 1 byte.
             # mp_conn.read will block if no bytes are available.
             # Timeout is controlled by TimeOut directive of Apache.
-            frame_type_str = msgutil._receive_bytes(self._request, 1)
+            frame_type_str = msgutil._read(self._request, 1)
             frame_type = ord(frame_type_str[0])
             if (frame_type & 0x80) == 0x80:
                 # The payload length is specified in the frame.

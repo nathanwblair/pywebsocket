@@ -137,6 +137,7 @@ class Dispatcher(object):
                       scan time when root_dir contains many subdirectories.
         """
 
+        self._logger = logging.getLogger("mod_pywebsocket.dispatch")
         self._handlers = {}
         self._source_warnings = []
         if scan_dir is None:
@@ -194,10 +195,10 @@ class Dispatcher(object):
         draft = request.headers_in.get('Sec-WebSocket-Draft')
         if (draft is not None and len(draft) > 0 and int(draft) >= 1):
             # Make this default when ready
-            logging.info('Use IETF HyBi 01 framing')
+            self._logger.debug('IETF HyBi 01 framing')
             request.ws_stream = stream.Stream(request)
         else:
-            logging.info('Use IETF Hixie 75 framing')
+            self._logger.debug('IETF Hixie 75 framing')
             request.ws_stream = stream_hixie75.StreamHixie75(request)
 
     def transfer_data(self, request):
@@ -222,7 +223,7 @@ class Dispatcher(object):
                     e)
                 raise
             except Exception, e:
-                traceback.print_exc()
+                print 'exception: %s' % type(e)
                 util.prepend_message_to_exception(
                     '%s raised exception for %s: ' % (
                     _TRANSFER_DATA_HANDLER_NAME, request.ws_resource),

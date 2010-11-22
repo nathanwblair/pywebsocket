@@ -60,6 +60,15 @@ class ConnectionTerminatedException(MsgUtilException):
     pass
 
 
+def _read(request, length):
+    bytes = request.connection.read(length)
+    if not bytes:
+        raise MsgUtilException(
+                'Failed to receive message from %r' %
+                        (request.connection.remote_addr,))
+    return bytes
+
+
 def _write(request, bytes):
     try:
         request.connection.write(bytes)
@@ -163,9 +172,7 @@ def _payload_length(request):
 
     length = 0
     while True:
-        b_str = request.connection.read(1)
-        if not b_str:
-            raise Exception('connection closed unexpectedly')
+        b_str = _read(request, 1)
         b = ord(b_str)
         length = length * 128 + (b & 0x7f)
         if (b & 0x80) == 0:
@@ -183,9 +190,7 @@ def _receive_bytes(request, length):
 
     bytes = []
     while length > 0:
-        new_bytes = request.connection.read(length)
-        if not new_bytes:
-            raise Exception('connection closed unexpectedly')
+        new_bytes = _read(request, length)
         bytes.append(new_bytes)
         length -= len(new_bytes)
     return ''.join(bytes)
@@ -198,11 +203,9 @@ def _read_until(request, delim_char):
 
     bytes = []
     while True:
-        ch = request.connection.read(1)
+        ch = _read(request, 1)
         if ch == delim_char:
             break
-        elif not ch:
-            raise Exception('connection closed unexpectedly')
         bytes.append(ch)
     return ''.join(bytes)
 

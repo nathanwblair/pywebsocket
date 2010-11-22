@@ -60,7 +60,7 @@ or
  run with --allow-draft75
 
 # run echo client to test Hixie 75 protocol
- run with --protocol-version=draft75
+ run with --protocol-version=hixie75
 """
 
 

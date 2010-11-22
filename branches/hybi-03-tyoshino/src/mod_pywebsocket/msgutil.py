@@ -173,7 +173,7 @@ def _payload_length(request):
     length = 0
     while True:
         b_str = _read(request, 1)
-        b = ord(b_str)
+        b = ord(b_str[0])
         length = length * 128 + (b & 0x7f)
         if (b & 0x80) == 0:
             break

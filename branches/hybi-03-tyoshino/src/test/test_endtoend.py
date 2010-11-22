@@ -117,7 +117,7 @@ class EndToEndTest(unittest.TestCase):
           [self.echo_client_command, '-p', str(self.test_port),
            '-s', 'localhost', '-o', 'http://localhost',
            '-r', '/echo', '-m', 'test',
-           '--hybi00'])
+           '--protocol-version', 'hybi00'])
       actual = self._get_client_output(client)
       self.assertEqual('Send: test\nRecv: test\nClosing handshake\n', actual)
       client.wait()
@@ -133,7 +133,7 @@ class EndToEndTest(unittest.TestCase):
           [self.echo_client_command, '-p', str(self.test_port),
            '-s', 'localhost', '-o', 'http://localhost',
            '-r', '/echo', '-m', 'test,Goodbye',
-           '--hybi00'])
+           '--protocol-version', 'hybi00'])
       actual = self._get_client_output(client)
       self.assertEqual('Send: test\nRecv: test\n'
                        'Send: Goodbye\nRecv: Goodbye\n', actual)
@@ -151,7 +151,7 @@ class EndToEndTest(unittest.TestCase):
           [self.echo_client_command, '-p', str(self.test_port),
            '-s', 'localhost', '-o', 'http://localhost',
            '-r', '/echo', '-m', 'test',
-           '--hixie75'])
+           '--protocol-version', 'hixie75'])
       actual = self._get_client_output(client)
       self.assertEqual('Send: test\nRecv: test\n', actual)
       client.wait()
@@ -168,7 +168,7 @@ class EndToEndTest(unittest.TestCase):
           [self.echo_client_command, '-p', str(self.test_port),
            '-s', 'localhost', '-o', 'http://localhost',
            '-r', '/echo', '-m', 'test,Goodbye',
-           '--hixie75'])
+           '--protocol-version', 'hixie75'])
       actual = self._get_client_output(client)
       self.assertEqual('Send: test\nRecv: test\n'
                        'Send: Goodbye\nRecv: Goodbye\n', actual)

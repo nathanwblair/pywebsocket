@@ -173,6 +173,27 @@ class MessageTestHixie75(unittest.TestCase):
                 length,
                 msgutil._payload_length(_create_request_hixie75(bytes)))
 
+    def test_create_header(self):
+        # More, rsvN are all true
+        header = msgutil.create_header(msgutil.OPCODE_TEXT, 1, 1, 1, 1, 1, 1)
+        self.assertEqual('\xf4\x81', header)
+
+        # Invalid opcode 0x10
+        self.assertRaises(Exception,
+                          msgutil.create_header,
+                          0x10, 0, 0, 0, 0, 0, 0)
+
+        # Invalid value 0xf passed to rsv1
+        self.assertRaises(Exception,
+                          msgutil.create_header,
+                          msgutil.OPCODE_TEXT, 0, 0xf, 0, 0, 0, 0)
+
+        # Too long payload_length
+        self.assertRaises(Exception,
+                          msgutil.create_header,
+                          msgutil.OPCODE_TEXT, 1 << 63, 0, 0, 0, 0, 0)
+
+
 
 class MessageReceiverTest(unittest.TestCase):
     def test_queue(self):

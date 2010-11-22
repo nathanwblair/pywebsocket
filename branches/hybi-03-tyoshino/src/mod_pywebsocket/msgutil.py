@@ -38,9 +38,18 @@ not suitable because they don't allow direct raw bytes writing/reading.
 
 
 import Queue
+import struct
 import threading
 
 from mod_pywebsocket import util
+
+
+OPCODE_CONTINUATION = 0
+OPCODE_CLOSE = 1
+OPCODE_PING = 2
+OPCODE_PONG = 3
+OPCODE_TEXT = 4
+OPCODE_BINARY = 5
 
 
 class MsgUtilException(Exception):
@@ -94,7 +103,64 @@ def receive_message(request):
     return request.ws_stream.receive_message()
 
 
+def create_length_header(length, rsv4):
+    """Creates a length header."""
+
+    if rsv4 != 0 and rsv4 != 1:
+        raise Exception('rsv4 must be 0 or 1')
+
+    header = ''
+
+    if length <= 125:
+        second_byte = rsv4 << 7 | length
+        header += chr(second_byte)
+    elif length < 1 << 16:
+        second_byte = rsv4 << 7 | 126
+        header += chr(second_byte) + struct.pack('!H', length)
+    elif length < 1 << 63:
+        second_byte = rsv4 << 7 | 127
+        header += chr(second_byte) + struct.pack('!Q', length)
+    else:
+        raise StreamException('Payload is too big for one frame')
+
+    return header
+
+
+def create_header(opcode, payload_length, more, rsv1, rsv2, rsv3, rsv4):
+    """Creates a frame header."""
+
+    if (opcode < 0) or (0xf < opcode):
+        raise Exception('Opcode out of range')
+
+    if (payload_length < 0) or (1 << 63 <= payload_length):
+        raise Exception('payload_length out of range')
+
+    if (more | rsv1 | rsv2 | rsv3 | rsv4) & ~1:
+        raise Exception('Reserved bit parameter must be 0 or 1')
+
+    header = ''
+
+    first_byte = (more << 7
+                  | rsv1 << 6 | rsv2 << 5 | rsv3 << 4
+                  | opcode)
+    header += chr(first_byte)
+    header += create_length_header(payload_length, rsv4)
+
+    return header
+
+
+def create_text_frame(message):
+    """Creates a simple text frame with no extension, reserved bit."""
+
+    encoded_message = message.encode('utf-8')
+    frame = create_header(OPCODE_TEXT, len(encoded_message), 0, 0, 0, 0, 0)
+    frame += encoded_message
+    return frame
+
+
 def _payload_length(request):
+    """Reads a length header in a Hixie75 version frame with length."""
+
     length = 0
     while True:
         b_str = request.connection.read(1)
@@ -126,6 +192,10 @@ def _receive_bytes(request, length):
 
 
 def _read_until(request, delim_char):
+    """Reads bytes until we encounter delim_char. The result will not contain
+    delim_char.
+    """
+
     bytes = []
     while True:
         ch = request.connection.read(1)

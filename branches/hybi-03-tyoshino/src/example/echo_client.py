@@ -50,11 +50,14 @@ Example Usage:
      -o http://localhost -r /echo -m test
 
 or
+
+# run echo client to test IETF HyBi 00 protocol
+ run with --protocol-version=hybi00
+
+or
+
 # server setup to test Hixie 75 protocol
  run with --allow-draft75
-
-# run echo client to test IETF HyBi 75 protocol
- run with --protocol-version=hybi00
 
 # run echo client to test Hixie 75 protocol
  run with --protocol-version=draft75
@@ -77,6 +80,7 @@ _DEFAULT_PORT = 80
 _DEFAULT_SECURE_PORT = 443
 _UNDEFINED_PORT = -1
 
+# Special message that tells the echo server to start closing handshake
 _GOODBYE_MESSAGE = 'Goodbye'
 
 # Opcodes introduced in IETF HyBi 01 for the new framing format
@@ -98,15 +102,15 @@ def _hexify(s):
     return re.sub(".", lambda x: "%02x " % ord(x.group(0)), s)
 
 
-def _receive_bytes(socket, left):
-    chunks = []
-    while left > 0:
-        chunk = socket.recv(left)
-        if len(chunk) == 0:
-            break
-        chunks.append(chunk)
-        left -= len(chunk)
-    return ''.join(chunks)
+def _receive_bytes(socket, length):
+    bytes = []
+    while length > 0:
+        new_bytes = socket.recv(length)
+        if not new_bytes:
+            raise Exception('connection closed unexpectedly')
+        bytes.append(new_bytes)
+        length -= len(new_bytes)
+    return ''.join(bytes)
 
 
 class _TLSSocket(object):
@@ -192,9 +196,7 @@ class WebSocketHandshake(object):
         # bytes.
         field = ""
         while True:
-            ch = self._socket.recv(1)
-            if not ch:
-                raise Exception('connection closed unexpectedly')
+            ch = _receive_bytes(self._socket, 1)
             field += ch
             if ch == '\n':
                 break
@@ -224,7 +226,7 @@ class WebSocketHandshake(object):
         fields = self._read_fields()
         # 4.1 40. _Fields processing_
         # read a byte from server
-        ch = _receive_bytes(self._socket, 1)[0]
+        ch = _receive_bytes(self._socket, 1)
         if ch != '\n':  # 0x0A
             raise Exception('expected LF after line: %s: %s' % (name, value))
         # 4.1 41. check /fields/
@@ -336,7 +338,7 @@ class WebSocketHandshake(object):
             # 4.1 36. read /value/
             value = self._read_value(ch)
             # 4.1 37. read a byte from the server
-            ch = self._socket.recv(1)
+            ch = _receive_bytes(self._socket, 1)
             if ch != '\n':  # 0x0A
                 raise Exception('expected LF after line: %s: %s' % (
                     name, value))
@@ -354,7 +356,7 @@ class WebSocketHandshake(object):
         name = ""
         while True:
             # 4.1 34. read a byte from the server
-            ch = self._socket.recv(1)
+            ch = _receive_bytes(self._socket, 1)
             if ch == '\r':  # 0x0D
                 return None
             elif ch == '\n':  # 0x0A
@@ -364,19 +366,15 @@ class WebSocketHandshake(object):
             elif ch >= 'A' and ch <= 'Z':  # range 0x31 to 0x5A
                 ch = chr(ord(ch) + 0x20)
                 name += ch
-            elif not ch:
-                raise Exception('connection closed unexpectedly')
             else:
                 name += ch
 
     def _skip_spaces(self):
         # 4.1 35. read a byte from the server
         while True:
-            ch = self._socket.recv(1)
+            ch = _receive_bytes(self._socket, 1)
             if ch == ' ':  # 0x20
                 continue
-            elif not ch:
-                raise Exception('connection closed unexpectedly')
             return ch
 
     def _read_value(self, ch):
@@ -386,13 +384,11 @@ class WebSocketHandshake(object):
         value += ch
         # 4.1 36. read a byte from server.
         while True:
-            ch = self._socket.recv(1)
+            ch = _receive_bytes(self._socket, 1)
             if ch == '\r':  # 0x0D
                 return value
             elif ch == '\n':  # 0x0A
                 raise Exception('unexpected LF in value reading')
-            elif not ch:
-                raise Exception('connection closed unexpectedly')
             else:
                 value += ch
 
@@ -400,13 +396,11 @@ class WebSocketHandshake(object):
         terminator = '\r\n\r\n'
         pos = 0
         while pos < len(terminator):
-            received = self._socket.recv(1)
+            received = _receive_bytes(self._socket, 1)
             if received == terminator[pos]:
                 pos += 1
             elif received == terminator[0]:
                 pos = 1
-            elif not received:
-                raise Exception('connection closed unexpectedly')
             else:
                 pos = 0
 
@@ -451,7 +445,7 @@ class WebSocketHixie75Handshake(WebSocketHandshake):
         self._socket.send('\r\n')
 
         for expected_char in WebSocketHixie75Handshake._EXPECTED_RESPONSE:
-            received = self._socket.recv(1)
+            received = _receive_bytes(self._socket, 1)
             if expected_char != received:
                 raise Exception('Handshake failure')
         # We cut corners and skip other headers.
@@ -490,8 +484,6 @@ class EchoClient(object):
                 if self._options.verbose:
                     print 'Send: %s' % line
                 received = _receive_bytes(self._socket, len(frame))
-                if len(received) == 0:
-                    raise Exception('Didn\'t receive complete frame')
                 if received != frame:
                     raise Exception('Incorrect echo: %r' % received)
                 if self._options.verbose:
@@ -615,7 +607,7 @@ class EchoClientHybi00(EchoClient):
     """Web Socket echo client using IETF HyBi 00 protocol."""
 
     def _create_handshake(self):
-        return WebSocketHixie75Handshake(self._socket, self._options)
+        return WebSocketHandshake(self._socket, self._options)
 
     def _create_text_frame(self, payload):
         encoded_payload = payload.encode('utf-8')
@@ -680,6 +672,9 @@ def main():
                       + '\'hybi01\', \'hybi00\', \'hixie75\'')
 
     (options, unused_args) = parser.parse_args()
+
+    if options.draft75:
+        options.protocol_version = 'hixie75'
 
     # Default port number depends on whether TLS is used.
     if options.server_port == _UNDEFINED_PORT:

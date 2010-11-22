@@ -37,57 +37,12 @@ import struct
 from mod_pywebsocket import msgutil
 
 
-_OPCODE_CONTINUATION = 0
-_OPCODE_CLOSE = 1
-_OPCODE_PING = 2
-_OPCODE_PONG = 3
-_OPCODE_TEXT = 4
-_OPCODE_BINARY = 5
-
-
 class ConnectionTerminatedException(msgutil.ConnectionTerminatedException):
     pass
 
 
 class StreamException(RuntimeError):
     pass
-
-
-def _create_length_header(length, rsv4):
-    header = ''
-
-    if length <= 125:
-        second_byte = rsv4 << 7 | length
-        header += chr(second_byte)
-    elif length < 1 << 16:
-        second_byte = rsv4 << 7 | 126
-        header += chr(second_byte) + struct.pack('!H', length)
-    elif length < 1 << 63:
-        second_byte = rsv4 << 7 | 127
-        header += chr(second_byte) + struct.pack('!Q', length)
-    else:
-        raise StreamException('Payload is too big for one frame')
-
-    return header
-
-
-def _create_header(opcode, payload_length, more, rsv1, rsv2, rsv3, rsv4):
-    header = ''
-
-    first_byte = (more << 7
-                  | rsv1 << 6 | rsv2 << 5 | rsv3 << 4
-                  | opcode)
-    header += chr(first_byte)
-    header += _create_length_header(payload_length, rsv4)
-
-    return header
-
-
-def _create_text_frame(message):
-    encoded_message = message.encode('utf-8')
-    frame = _create_header(_OPCODE_TEXT, len(encoded_message), 0, 0, 0, 0, 0)
-    frame += encoded_message
-    return frame
 
 
 def _receive_frame(request):
@@ -142,7 +97,7 @@ class Stream(object):
         if self._request.server_terminated:
             raise ConnectionTerminatedException
 
-        msgutil._write(self._request, _create_text_frame(message))
+        msgutil._write(self._request, msgutil.create_text_frame(message))
 
     def receive_message(self):
         """Receive a WebSocket frame and return its payload an unicode string.
@@ -158,13 +113,13 @@ class Stream(object):
 
             (opcode, bytes, _, _, _, _, _) = _receive_frame(self._request)
 
-            if opcode == _OPCODE_TEXT:
+            if opcode == msgutil.OPCODE_TEXT:
                 # The Web Socket protocol section 4.4 specifies that invalid
                 # characters must be replaced with U+fffd REPLACEMENT
                 # CHARACTER.
                 message = bytes.decode('utf-8', 'replace')
                 return message
-            elif opcode == _OPCODE_CLOSE:
+            elif opcode == msgutil.OPCODE_CLOSE:
                 self._request.client_terminated = True
                 raise ConnectionTerminatedException
             # Discard data of other types.
@@ -178,7 +133,7 @@ class Stream(object):
         # 1. send a 0xFF byte and a 0x00 byte to the client to indicate the
         # start
         # of the closing handshake.
-        msgutil._write(self._request, chr(_OPCODE_CLOSE) + '\x00')
+        msgutil._write(self._request, chr(msgutil.OPCODE_CLOSE) + '\x00')
         self._request.server_terminated = True
         # TODO(ukai): 2. wait until the /client terminated/ flag has been set,
         # or until a server-defined timeout expires.

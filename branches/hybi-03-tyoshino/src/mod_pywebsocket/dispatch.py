@@ -193,6 +193,7 @@ class Dispatcher(object):
     def _create_stream(self, request):
         draft = request.headers_in.get('Sec-WebSocket-Draft')
         if (draft is not None and len(draft) > 0 and int(draft) >= 1):
+            # Make this default when ready
             logging.info('Use IETF HyBi 01 framing')
             request.ws_stream = stream.Stream(request)
         else:

@@ -54,7 +54,7 @@ _MANDATORY_HEADERS = [
 ]
 
 def _hexify(s):
-    return re.sub('.', lambda x: '%02x ' % ord(x.group(0)), s, flags=re.DOTALL)
+    return re.sub('(?s).', lambda x: '%02x ' % ord(x.group(0)), s)
 
 class Handshaker(object):
     """This class performs Web Socket handshake."""

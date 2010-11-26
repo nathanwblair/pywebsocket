@@ -32,10 +32,8 @@
 """
 
 
-import logging
 import os
 import re
-import traceback
 
 from mod_pywebsocket import msgutil
 from mod_pywebsocket import util
@@ -135,7 +133,6 @@ class Dispatcher(object):
                       scan time when root_dir contains many subdirectories.
         """
 
-        self._logger = logging.getLogger("mod_pywebsocket.dispatch")
         self._handlers = {}
         self._source_warnings = []
         if scan_dir is None:

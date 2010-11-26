@@ -83,6 +83,8 @@ class EndToEndTest(unittest.TestCase):
       server = self._run_server(
           [self.standalone_command, '-p', str(self.test_port),
            '-d', self.document_root])
+      # TODO(tyoshino): add some logic to poll the server until it becomes
+      # ready
       time.sleep(0.2)
       client = self._run_client(
           [self.echo_client_command, '-p', str(self.test_port),

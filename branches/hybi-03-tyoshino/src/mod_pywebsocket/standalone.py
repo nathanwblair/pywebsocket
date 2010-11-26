@@ -72,7 +72,6 @@ import os
 import re
 import socket
 import sys
-import traceback
 
 _HAS_OPEN_SSL = False
 try:

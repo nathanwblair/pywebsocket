@@ -136,6 +136,8 @@ class Handshaker(object):
         draft = self._request.headers_in.get('Sec-WebSocket-Draft')
         if draft is not None:
             try:
+                if int(draft) < 0:
+                    raise ValueError
                 if int(draft) >= 1:
                     # Make this default when ready.
                     self._logger.debug('IETF HyBi 01 framing')
@@ -167,14 +169,16 @@ class Handshaker(object):
         # 5.2 4. let /key-number_n/ be the digits (characters in the range
         # U+0030 DIGIT ZERO (0) to U+0039 DIGIT NINE (9)) in /key_n/,
         # interpreted as a base ten integer, ignoring all other characters
-        # in /key_n/
+        # in /key_n/.
         try:
             key_number = int(re.sub("\\D", "", key_value))
         except:
-            raise HandshakeError('%s field contains no digit' % key_value)
+            raise HandshakeError('%s field contains no digit' % key_field)
         # 5.2 5. let /spaces_n/ be the number of U+0020 SPACE characters
         # in /key_n/.
         spaces = re.subn(" ", "", key_value)[1]
+        if spaces == 0:
+            raise HandshakeError('%s field contains no space' % key_field)
         # 5.2 6. if /key-number_n/ is not an integral multiple of /spaces_n/
         # then abort the WebSocket connection.
         if key_number % spaces != 0:

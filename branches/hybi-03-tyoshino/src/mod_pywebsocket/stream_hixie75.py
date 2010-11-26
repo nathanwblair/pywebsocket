@@ -59,7 +59,7 @@ class StreamHixie75(object):
         """
         if self._request.server_terminated:
             raise ConnectionTerminatedException
-        msgutil._write(self._request,
+        msgutil.write_better_exc(self._request,
                        ''.join(['\x00', message.encode('utf-8'), '\xff']))
 
     def receive_message(self):
@@ -74,13 +74,13 @@ class StreamHixie75(object):
             # Read 1 byte.
             # mp_conn.read will block if no bytes are available.
             # Timeout is controlled by TimeOut directive of Apache.
-            frame_type_str = msgutil._read(self._request, 1)
+            frame_type_str = msgutil.read_better_exc(self._request, 1)
             frame_type = ord(frame_type_str[0])
             if (frame_type & 0x80) == 0x80:
                 # The payload length is specified in the frame.
                 # Read and discard.
                 length = msgutil._payload_length(self._request)
-                msgutil._receive_bytes(self._request, length)
+                msgutil.receive_bytes(self._request, length)
                 # 5.3 3. 12. if /type/ is 0xFF and /length/ is 0, then set the
                 # /client terminated/ flag and abort these steps.
                 if frame_type == 0xFF and length == 0:
@@ -88,7 +88,7 @@ class StreamHixie75(object):
                     raise ConnectionTerminatedException
             else:
                 # The payload is delimited with \xff.
-                bytes = msgutil._read_until(self._request, '\xff')
+                bytes = msgutil.read_until(self._request, '\xff')
                 # The Web Socket protocol section 4.4 specifies that invalid
                 # characters must be replaced with U+fffd REPLACEMENT
                 # CHARACTER.
@@ -105,7 +105,7 @@ class StreamHixie75(object):
         # running through the following steps:
         # 1. send a 0xFF byte and a 0x00 byte to the client to indicate the
         # start of the closing handshake.
-        msgutil._write(self._request, '\xff\x00')
+        msgutil.write_better_exc(self._request, '\xff\x00')
         self._request.server_terminated = True
         # TODO(ukai): 2. wait until the /client terminated/ flag has been set,
         # or until a server-defined timeout expires.

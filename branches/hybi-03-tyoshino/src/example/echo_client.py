@@ -484,11 +484,19 @@ class EchoClient(object):
                 if self._options.verbose:
                     print 'Send: %s' % line
                 received = _receive_bytes(self._socket, len(frame))
-                if received != frame:
-                    raise Exception('Incorrect echo: %r' % received)
-                if self._options.verbose:
+
+                try:
                     payload = self._parse_frame_briefly(received)
-                    print 'Recv: %s' % payload
+
+                    if self._options.verbose:
+                        print 'Recv: %s' % payload
+
+                    if received != frame:
+                        raise Exception('Incorrect echo: %r' % received)
+                except Exception, e:
+                    if self._options.verbose:
+                        print 'Error: %s' % e
+                    raise
 
             self._do_closing_handshake()
         finally:
@@ -564,34 +572,36 @@ class EchoClient(object):
         return header + encoded_payload
 
     def _parse_frame_briefly(self, frame):
-        first_byte = ord(frame[0])
         if len(frame) <= 1:
-            return '<Incomplete frame>'
-        elif first_byte & 0xf != _OPCODE_TEXT:
-            return '<Bad opcode %d>' % first_byte
+            raise Exception('Incomplete %d octet frame' % len(frame))
+
+        first_byte = ord(frame[0])
+        if first_byte & 0xf != _OPCODE_TEXT:
+            raise Exception('Bad opcode %d' % (first_byte & 0xf))
         elif first_byte & 0xf0:
-            return '<Unsupported flag is set>'
+            raise Exception(
+                'Any of unsupported flag more/rsv1/rsv2/rsv3 is set')
 
         second_byte = ord(frame[1])
         if second_byte & 0x80:
-            return '<Unsupported flag is set>'
+            raise Exception('Unsupported flag rsv4 is set')
 
         payload_length = second_byte & 0x7f
         if payload_length == 127:
             if len(frame) < 2 + 8:
-                return '<Incomplete length header>'
+                raise Exception('Incomplete length header')
             payload_length = struct.unpack('!Q', frame[2:9])[0]
             payload_pos = 10
         elif payload_length == 126:
             if len(frame) < 2 + 2:
-                return '<Incomplete length header>'
+                raise Exception('Incomplete length header')
             payload_length = struct.unpack('!H', frame[2:3])[0]
             payload_pos = 4
         else:
             payload_pos = 2
 
         if len(frame) < payload_pos + payload_length:
-            return '<Incomplete payload>'
+            raise Exception('Incomplete payload')
 
         payload = frame[payload_pos:payload_pos + payload_length]
         return payload.decode('utf-8', 'replace')
@@ -601,9 +611,9 @@ class EchoClient(object):
 
     def _parse_frame_briefly_hixie75(self, frame):
         if len(frame) <= 0:
-            return '<Zero byte frame>'
+            raise Exception('Incomplete 0 octet frame')
         elif frame[0] != '\x00':
-            return '<Bad frame type %d>' % ord(frame[0])
+            raise Exception('Bad frame type %d' % ord(frame[0]))
         else:
             return frame[1:-1].decode('utf-8', 'replace')
 

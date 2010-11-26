@@ -37,8 +37,6 @@ import os
 import re
 import traceback
 
-from mod_pywebsocket import stream
-from mod_pywebsocket import stream_hixie75
 from mod_pywebsocket import msgutil
 from mod_pywebsocket import util
 
@@ -191,16 +189,6 @@ class Dispatcher(object):
                     e)
             raise
 
-    def _create_stream(self, request):
-        draft = request.headers_in.get('Sec-WebSocket-Draft')
-        if (draft is not None and len(draft) > 0 and int(draft) >= 1):
-            # Make this default when ready
-            self._logger.debug('IETF HyBi 01 framing')
-            request.ws_stream = stream.Stream(request)
-        else:
-            self._logger.debug('IETF Hixie 75 framing')
-            request.ws_stream = stream_hixie75.StreamHixie75(request)
-
     def transfer_data(self, request):
         """Let a handler transfer_data with a Web Socket client.
 
@@ -214,7 +202,6 @@ class Dispatcher(object):
         unused_do_extra_handshake, transfer_data_ = self._handler(request)
         try:
             try:
-                self._create_stream(request)
                 transfer_data_(request)
             except msgutil.ConnectionTerminatedException, e:
                 util.prepend_message_to_exception(

@@ -64,7 +64,11 @@ class ConnectionTerminatedException(MsgUtilException):
     pass
 
 
-def _read(request, length):
+def read_better_exc(request, length):
+    """Reads length bytes from connection. In case we catch any exception,
+    prepends remote address to the exception message and raise again.
+    """
+
     bytes = request.connection.read(length)
     if not bytes:
         raise MsgUtilException(
@@ -73,7 +77,11 @@ def _read(request, length):
     return bytes
 
 
-def _write(request, bytes):
+def write_better_exc(request, bytes):
+    """Writes given bytes to connection. In case we catch any exception,
+    prepends remote address to the exception message and raise again.
+    """
+
     try:
         request.connection.write(bytes)
     except Exception, e:
@@ -176,7 +184,7 @@ def _payload_length(request):
 
     length = 0
     while True:
-        b_str = _read(request, 1)
+        b_str = read_better_exc(request, 1)
         b = ord(b_str[0])
         length = length * 128 + (b & 0x7f)
         if (b & 0x80) == 0:
@@ -184,7 +192,7 @@ def _payload_length(request):
     return length
 
 
-def _receive_bytes(request, length):
+def receive_bytes(request, length):
     """Receives multiple bytes. Retries read when we couldn't receive the
     specified amount.
 
@@ -194,20 +202,20 @@ def _receive_bytes(request, length):
 
     bytes = []
     while length > 0:
-        new_bytes = _read(request, length)
+        new_bytes = read_better_exc(request, length)
         bytes.append(new_bytes)
         length -= len(new_bytes)
     return ''.join(bytes)
 
 
-def _read_until(request, delim_char):
+def read_until(request, delim_char):
     """Reads bytes until we encounter delim_char. The result will not contain
     delim_char.
     """
 
     bytes = []
     while True:
-        ch = _read(request, 1)
+        ch = read_better_exc(request, 1)
         if ch == delim_char:
             break
         bytes.append(ch)

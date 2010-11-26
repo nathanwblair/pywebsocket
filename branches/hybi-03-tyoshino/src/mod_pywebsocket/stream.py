@@ -46,7 +46,7 @@ class StreamException(RuntimeError):
 
 
 def _receive_frame(request):
-    received = msgutil._receive_bytes(request, 2)
+    received = msgutil.receive_bytes(request, 2)
 
     first_byte = ord(received[0])
     more = first_byte >> 7 & 1
@@ -60,15 +60,15 @@ def _receive_frame(request):
     payload_length = second_byte & 0x7f
 
     if payload_length == 127:
-        extended_payload_length = msgutil._receive_bytes(request, 8)
+        extended_payload_length = msgutil.receive_bytes(request, 8)
         payload_length = struct.unpack(
             '!Q', extended_payload_length)[0]
     elif payload_length == 126:
-        extended_payload_length = msgutil._receive_bytes(request, 2)
+        extended_payload_length = msgutil.receive_bytes(request, 2)
         payload_length = struct.unpack(
             '!H', extended_payload_length)[0]
 
-    bytes = msgutil._receive_bytes(request, payload_length)
+    bytes = msgutil.receive_bytes(request, payload_length)
 
     return (opcode, bytes, more, rsv1, rsv2, rsv3, rsv4)
 
@@ -97,7 +97,7 @@ class Stream(object):
         if self._request.server_terminated:
             raise ConnectionTerminatedException
 
-        msgutil._write(self._request, msgutil.create_text_frame(message))
+        msgutil.write_better_exc(self._request, msgutil.create_text_frame(message))
 
     def receive_message(self):
         """Receive a WebSocket frame and return its payload an unicode string.
@@ -133,7 +133,7 @@ class Stream(object):
         # 1. send a 0xFF byte and a 0x00 byte to the client to indicate the
         # start
         # of the closing handshake.
-        msgutil._write(self._request, chr(msgutil.OPCODE_CLOSE) + '\x00')
+        msgutil.write_better_exc(self._request, chr(msgutil.OPCODE_CLOSE) + '\x00')
         self._request.server_terminated = True
         # TODO(ukai): 2. wait until the /client terminated/ flag has been set,
         # or until a server-defined timeout expires.

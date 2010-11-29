@@ -75,6 +75,13 @@ import struct
 import sys
 
 
+_LOG_LEVELS = {
+    'debug': logging.DEBUG,
+    'info': logging.INFO,
+    'warn': logging.WARN,
+    'error': logging.ERROR,
+    'critical': logging.CRITICAL};
+
 _TIMEOUT_SEC = 10
 _DEFAULT_PORT = 80
 _DEFAULT_SECURE_PORT = 443
@@ -686,8 +693,15 @@ def main():
                       type='string', default='hybi01',
                       help='WebSocket protocol version to use. One of '
                       + '\'hybi01\', \'hybi00\', \'hixie75\'')
+    parser.add_option('--log-level', '--log_level', type='choice',
+                      dest='log_level', default='warn',
+                      choices=['debug', 'info', 'warn', 'error', 'critical'],
+                      help='Log level.')
 
     (options, unused_args) = parser.parse_args()
+
+    logger = logging.getLogger()
+    logger.setLevel(_LOG_LEVELS[options.log_level])
 
     if options.draft75:
         options.protocol_version = 'hixie75'

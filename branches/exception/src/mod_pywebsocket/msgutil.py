@@ -54,13 +54,18 @@ OPCODE_BINARY       = 0x5
 
 
 class MsgUtilException(Exception):
+    """This exception will be raised when a connection is terminated."""
     pass
 
 
-# TODO(tyoshino): This class is not used only for client initiated closing
-# handshake. Arrange exception definition and fix the code prepending
-# exception info in dispatch.py.
 class ConnectionTerminatedException(MsgUtilException):
+    """This exception will be raised when a connection is terminated."""
+    pass
+
+
+class ConnectionClosedException(ConnectionTerminatedException):
+    """This exception will be raised when a connection is terminated after
+    successful closing handshake."""
     pass
 
 
@@ -72,8 +77,8 @@ def read_better_exc(request, length):
     bytes = request.connection.read(length)
     if not bytes:
         raise MsgUtilException(
-                'Failed to receive message from %r' %
-                        (request.connection.remote_addr,))
+            'Receiving %d byte failed. Peer (%r) closed connection' %
+            (length, (request.connection.remote_addr,)))
     return bytes
 
 
@@ -185,7 +190,7 @@ def _payload_length(request):
     length = 0
     while True:
         b_str = read_better_exc(request, 1)
-        b = ord(b_str[0])
+        b = ord(b_str)
         length = length * 128 + (b & 0x7f)
         if (b & 0x80) == 0:
             break

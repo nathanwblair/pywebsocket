@@ -46,6 +46,7 @@ class _MockConnBase(object):
 
     def __init__(self):
         self._write_data = []
+        self.remote_addr = 'fake_address'
 
     def write(self, data):
         """Override mod_python.apache.mp_conn.write."""
@@ -191,6 +192,7 @@ class MockRequest(object):
         # conflict with self.is_https(), it is named as such.
         self.is_https_ = is_https
         self.ws_stream = stream_hixie75.StreamHixie75(self)
+        self.draft = 0
 
     def is_https(self):
         """Return whether this request is over SSL."""

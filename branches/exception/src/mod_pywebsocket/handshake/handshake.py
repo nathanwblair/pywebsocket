@@ -73,6 +73,7 @@ class Handshaker(object):
         """
 
         self._logger = logging.getLogger("mod_pywebsocket.handshake")
+
         self._request = request
         self._dispatcher = dispatcher
 
@@ -142,6 +143,7 @@ class Handshaker(object):
                     # Make this default when ready.
                     self._logger.debug('IETF HyBi 01 framing')
                     self._request.ws_stream = stream.Stream(self._request)
+                    self._request.draft = draft
                     return
             except ValueError, e:
                 raise HandshakeError(
@@ -149,6 +151,7 @@ class Handshaker(object):
 
         self._logger.debug('IETF Hixie 75 framing')
         self._request.ws_stream = stream_hixie75.StreamHixie75(self._request)
+        self._request.draft = 0
 
     def _set_challenge_response(self):
         # 5.2 4-8.

@@ -32,17 +32,10 @@
 """
 
 
+import logging
 import struct
 
 from mod_pywebsocket import msgutil
-
-
-class ConnectionTerminatedException(msgutil.ConnectionTerminatedException):
-    pass
-
-
-class StreamException(RuntimeError):
-    pass
 
 
 def _receive_frame(request):
@@ -70,7 +63,7 @@ def _receive_frame(request):
 
     bytes = msgutil.receive_bytes(request, payload_length)
 
-    return (opcode, bytes, more, rsv1, rsv2, rsv3, rsv4)
+    return opcode, bytes, more, rsv1, rsv2, rsv3, rsv4
 
 
 class Stream(object):
@@ -84,6 +77,9 @@ class Stream(object):
         Args:
             request: mod_python request.
         """
+
+        self._logger = logging.getLogger("mod_pywebsocket.stream")
+
         self._request = request
         self._request.client_terminated = False
         self._request.server_terminated = False
@@ -94,24 +90,37 @@ class Stream(object):
         Args:
             message: unicode string to send.
         """
-        if self._request.server_terminated:
-            raise ConnectionTerminatedException
 
-        msgutil.write_better_exc(self._request, msgutil.create_text_frame(message))
+        if self._request.server_terminated:
+            raise msgutil.ConnectionTerminatedException(
+                'Requested send_message after sending out a closing handshake')
+
+        msgutil.write_better_exc(
+            self._request, msgutil.create_text_frame(message))
 
     def receive_message(self):
         """Receive a WebSocket frame and return its payload an unicode string.
 
         Returns:
             payload unicode string in a WebSocket frame.
+        Raises:
+            ConnectionClosedException: Connection is closed with successful
+                closing handshake.
+            ConnectionTerminatedException: Connection is terminated due to some
+                error.
+            MsgUtilException: Connection is closed unexpectedly while reading
+                data.
         """
+
         if self._request.client_terminated:
-            raise ConnectionTerminatedException
+            raise msgutil.ConnectionTerminatedException(
+                'Requested receive_message after receiving a closing handshake')
+
         while True:
             # mp_conn.read will block if no bytes are available.
             # Timeout is controlled by TimeOut directive of Apache.
 
-            (opcode, bytes, _, _, _, _, _) = _receive_frame(self._request)
+            opcode, bytes, _, _, _, _, _ = _receive_frame(self._request)
 
             if opcode == msgutil.OPCODE_TEXT:
                 # The Web Socket protocol section 4.4 specifies that invalid
@@ -121,22 +130,55 @@ class Stream(object):
                 return message
             elif opcode == msgutil.OPCODE_CLOSE:
                 self._request.client_terminated = True
-                raise ConnectionTerminatedException
+
+                if self._request.server_terminated:
+                    self._logger.debug(
+                        'Received ack for server-initiated closing '
+                        'handshake')
+                    raise msgutil.ConnectionClosedException(
+                        'Closing handshake finished successfully')
+
+                self._logger.debug(
+                    'Received client-initiated closing handshake')
+                self.close_connection()
             # Discard data of other types.
 
     def close_connection(self):
         """Closes a WebSocket connection."""
+
         if self._request.server_terminated:
+            self._logger.debug(
+                'Requested close_connection but server is already terminated')
             return
+
+        self._request.server_terminated = True
+
         # 5.3 the server may decide to terminate the WebSocket connection by
         # running through the following steps:
         # 1. send a 0xFF byte and a 0x00 byte to the client to indicate the
-        # start
-        # of the closing handshake.
+        # start of the closing handshake.
         msgutil.write_better_exc(self._request, chr(msgutil.OPCODE_CLOSE) + '\x00')
-        self._request.server_terminated = True
+
+        if self._request.client_terminated:
+            self._logger.debug(
+                'Sent ack for client-initiated closing handshake')
+            raise msgutil.ConnectionClosedException(
+                'Closing handshake finished successfully')
+
+        self._logger.debug(
+            'Sent server-initiated closing handshake')
+
         # TODO(ukai): 2. wait until the /client terminated/ flag has been set,
         # or until a server-defined timeout expires.
+        #
+        # For now, we expect receiving closing handshake right after sending
+        # out closing handshake.
+        try:
+            _ = self.receive_message()
+        except msgutil.ConnectionClosedException, e:
+            raise
+        raise msgutil.ConnectionTerminatedException(
+            'Didn\'t receive valid ack for closing handshake')
         # TODO: 3. close the WebSocket connection.
         # note: mod_python Connection (mp_conn) doesn't have close method.
 

@@ -155,6 +155,8 @@ _GOOD_REQUEST_WITH_OPTIONAL_HEADERS = (
     '^n:ds[4U'
 )
 
+# TODO(tyoshino): Include \r \n in key3, challenge response.
+
 _GOOD_REQUEST_WITH_NONPRINTABLE_KEY = (
     80,
     'GET',

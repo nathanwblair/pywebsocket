@@ -76,11 +76,12 @@ import sys
 
 
 _LOG_LEVELS = {
-    'debug': logging.DEBUG,
-    'info': logging.INFO,
-    'warn': logging.WARN,
-    'error': logging.ERROR,
-    'critical': logging.CRITICAL};
+    'debug'    : logging.DEBUG,
+    'info'     : logging.INFO,
+    'warn'     : logging.WARN,
+    'error'    : logging.ERROR,
+    'critical' : logging.CRITICAL
+}
 
 _TIMEOUT_SEC = 10
 _DEFAULT_PORT = 80
@@ -689,7 +690,8 @@ def main():
                        action='store_true', default=False,
                       help='use the Hixie 75 protocol. This overrides '
                       'protocol-version flag')
-    parser.add_option('--protocol-version', dest='protocol_version',
+    parser.add_option('--protocol-version', '--protocol_version',
+                      dest='protocol_version',
                       type='string', default='hybi01',
                       help='WebSocket protocol version to use. One of '
                       + '\'hybi01\', \'hybi00\', \'hixie75\'')

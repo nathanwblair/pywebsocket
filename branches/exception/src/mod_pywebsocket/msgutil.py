@@ -44,7 +44,12 @@ import threading
 from mod_pywebsocket import util
 
 
-# Frame opcodes defined in the spec
+# Constants indicating WebSocket protocol version.
+VERSION_HYBI01  = 1
+VERSION_HYBI00  = 0
+VERSION_HIXIE75 = -1
+
+# Frame opcodes defined in the spec.
 OPCODE_CONTINUATION = 0x0
 OPCODE_CLOSE        = 0x1
 OPCODE_PING         = 0x2
@@ -53,30 +58,47 @@ OPCODE_TEXT         = 0x4
 OPCODE_BINARY       = 0x5
 
 
-class MsgUtilException(Exception):
-    """This exception will be raised when a connection is terminated."""
+class ConnectionTerminatedException(Exception):
+    """This exception will be raised when a connection is terminated
+    unexpectedly.
+    """
     pass
 
 
-class ConnectionTerminatedException(MsgUtilException):
-    """This exception will be raised when a connection is terminated."""
+class InvalidFrameException(ConnectionTerminatedException):
+    """This exception will be raised when we received an invalid frame we
+    cannot parse.
+    """
     pass
 
 
-class ConnectionClosedException(ConnectionTerminatedException):
-    """This exception will be raised when a connection is terminated after
-    successful closing handshake."""
+class BadOperationException(RuntimeError):
+    """This exception will be raised when send_message() is called on
+    server-terminated connection or receive_message() is called on
+    client-terminated connection.
+    """
+    pass
+
+
+class UnsupportedFrameException(RuntimeError):
+    """This exception will be raised when we receive a frame with flag, opcode
+    we cannot handle. Handlers can just catch and ignore this exception and
+    call receive_message() again to continue processing the next frame.
+    """
     pass
 
 
 def read_better_exc(request, length):
     """Reads length bytes from connection. In case we catch any exception,
     prepends remote address to the exception message and raise again.
+
+    Raises:
+        ConnectionTerminatedException: when read returns empty string.
     """
 
     bytes = request.connection.read(length)
     if not bytes:
-        raise MsgUtilException(
+        raise ConnectionTerminatedException(
             'Receiving %d byte failed. Peer (%r) closed connection' %
             (length, (request.connection.remote_addr,)))
     return bytes
@@ -113,7 +135,7 @@ def send_message(request, message):
         request: mod_python request.
         message: unicode string to send.
     Raises:
-        ConnectionTerminatedException: when server already terminated.
+        BadOperationException: when server already terminated.
     """
     request.ws_stream.send_message(message)
 
@@ -124,13 +146,17 @@ def receive_message(request):
     Args:
         request: mod_python request.
     Raises:
-        ConnectionTerminatedException: when client already terminated.
+        BadOperationException: when client already terminated.
     """
     return request.ws_stream.receive_message()
 
 
 def create_length_header(length, rsv4):
-    """Creates a length header."""
+    """Creates a length header.
+
+    Raises:
+        Exception: when bad data is given.
+    """
 
     if rsv4 != 0 and rsv4 != 1:
         raise Exception('rsv4 must be 0 or 1')
@@ -147,13 +173,17 @@ def create_length_header(length, rsv4):
         second_byte = rsv4 << 7 | 127
         header += chr(second_byte) + struct.pack('!Q', length)
     else:
-        raise StreamException('Payload is too big for one frame')
+        raise Exception('Payload is too big for one frame')
 
     return header
 
 
 def create_header(opcode, payload_length, more, rsv1, rsv2, rsv3, rsv4):
-    """Creates a frame header."""
+    """Creates a frame header.
+
+    Raises:
+        Exception: when bad data is given.
+    """
 
     if opcode < 0 or 0xf < opcode:
         raise Exception('Opcode out of range')
@@ -184,8 +214,12 @@ def create_text_frame(message):
     return frame
 
 
-def _payload_length(request):
-    """Reads a length header in a Hixie75 version frame with length."""
+def payload_length(request):
+    """Reads a length header in a Hixie75 version frame with length.
+
+    Raises:
+        ConnectionTerminatedException: when read returns empty string.
+    """
 
     length = 0
     while True:
@@ -216,6 +250,9 @@ def receive_bytes(request, length):
 def read_until(request, delim_char):
     """Reads bytes until we encounter delim_char. The result will not contain
     delim_char.
+
+    Raises:
+        ConnectionTerminatedException: when read returns empty string.
     """
 
     bytes = []

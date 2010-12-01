@@ -42,6 +42,7 @@ from md5 import md5
 import re
 import struct
 
+from mod_pywebsocket import msgutil
 from mod_pywebsocket import stream
 from mod_pywebsocket import stream_hixie75
 from mod_pywebsocket.handshake._base import HandshakeError
@@ -78,7 +79,14 @@ class Handshaker(object):
         self._dispatcher = dispatcher
 
     def do_handshake(self):
-        """Perform Web Socket Handshake."""
+        """Perform Web Socket Handshake.
+
+        On _request, we set
+            ws_resource, ws_protocol, ws_location, ws_origin, ws_challenge,
+            ws_challenge_md5: WebSocket handshake information.
+            ws_stream: Frame generation/parsing class.
+            ws_version: Protocol version.
+        """
 
         # 5.1 Reading the client's opening handshake.
         # dispatcher sets it in self._request.
@@ -137,13 +145,14 @@ class Handshaker(object):
         draft = self._request.headers_in.get('Sec-WebSocket-Draft')
         if draft is not None:
             try:
-                if int(draft) < 0:
+                draftInt = int(draft)
+                if draftInt < 0:
                     raise ValueError
-                if int(draft) >= 1:
+                if draftInt >= 1:
                     # Make this default when ready.
                     self._logger.debug('IETF HyBi 01 framing')
                     self._request.ws_stream = stream.Stream(self._request)
-                    self._request.draft = draft
+                    self._request.ws_version = msgutil.VERSION_HYBI01
                     return
             except ValueError, e:
                 raise HandshakeError(
@@ -151,7 +160,7 @@ class Handshaker(object):
 
         self._logger.debug('IETF Hixie 75 framing')
         self._request.ws_stream = stream_hixie75.StreamHixie75(self._request)
-        self._request.draft = 0
+        self._request.ws_version = msgutil.VERSION_HYBI00
 
     def _set_challenge_response(self):
         # 5.2 4-8.

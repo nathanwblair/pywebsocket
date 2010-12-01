@@ -200,13 +200,17 @@ class Dispatcher(object):
         """
 
         unused_do_extra_handshake, transfer_data_ = self._handler(request)
+        # TODO(tyoshino): Terminate underlying TCP connection if possible.
         try:
             transfer_data_(request)
-            msgutil.close_connection(request)
-        except msgutil.MsgUtilException, e:
-            # Catches MsgUtilException, ConnectionTerminatedException and
-            # and msgutil.ConnectionClosedException the handler didn't handle.
-            self._logger.debug('%s' % e)
+            if not request.server_terminated:
+                msgutil.close_connection(request)
+        except msgutil.ConnectionTerminatedException, e:
+            # Catch non-critical exceptions the handler didn't handle.
+            self._logger.debug(str(e))
+        except msgutil.UnsupportedFrameException, e:
+            # Catch non-critical exceptions the handler didn't handle.
+            self._logger.debug(str(e))
         except Exception, e:
             util.prepend_message_to_exception(
                 '%s raised exception for %s: ' % (

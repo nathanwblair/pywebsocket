@@ -146,7 +146,11 @@ class MessageTest(unittest.TestCase):
     def test_receive_message_discard(self):
         request = _create_request('\x05\x06IGNORE\x04\x05Hello'
                                   '\x05\x09DISREGARD\x04\x06World!')
+        self.assertRaises(msgutil.UnsupportedFrameException,
+                          msgutil.receive_message, request)
         self.assertEqual('Hello', msgutil.receive_message(request))
+        self.assertRaises(msgutil.UnsupportedFrameException,
+                          msgutil.receive_message, request)
         self.assertEqual('World!', msgutil.receive_message(request))
 
 
@@ -191,7 +195,7 @@ class MessageTestHixie75(unittest.TestCase):
                               (0x1234, '\x80\xa4\x34')):
             self.assertEqual(
                 length,
-                msgutil._payload_length(_create_request_hixie75(bytes)))
+                msgutil.payload_length(_create_request_hixie75(bytes)))
 
     def test_create_header(self):
         # more, rsv1, ..., rsv4 are all true

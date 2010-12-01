@@ -197,7 +197,7 @@ class WebSocketHandshake(object):
         self._key3 = self._generate_key3()
         # 4.1 27. send /key3/ to the server.
         self._socket.send(self._key3)
-        logging.info("%s" % _hexify(self._key3))
+        logging.info("key3     : %s" % _hexify(self._key3))
 
         # 4.1 28. Read bytes from the server until either the connection closes,
         # or a 0x0A byte is read. let /field/ be these bytes, including the 0x0A
@@ -271,7 +271,7 @@ class WebSocketHandshake(object):
         challenge += struct.pack("!I", self._number2)
         challenge += self._key3
 
-        logging.info("num %d, %d, %s" % (
+        logging.info("num+key3 : %d, %d, %s" % (
             self._number1, self._number2,
             _hexify(self._key3)))
         logging.info("challenge: %s" % _hexify(challenge))

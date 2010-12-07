@@ -103,7 +103,7 @@ class StreamHixie75(object):
                 # 5.3 3. 12. if /type/ is 0xFF and /length/ is 0, then set the
                 # /client terminated/ flag and abort these steps.
                 if self._request.ws_version is msgutil.VERSION_HIXIE75:
-                    return
+                    continue
 
                 if frame_type == 0xFF and length == 0:
                     self._request.client_terminated = True

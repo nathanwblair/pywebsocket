@@ -68,12 +68,12 @@ import codecs
 import logging
 
 # Use md5 module in Python 2.4
-_HAS_HASHLIB = False
 try:
     import hashlib
-    _HAS_HASHLIB = True
+    md5_hash = hashlib.md5
 except ImportError:
     import md5
+    md5_hash = md5.md5
 
 from optparse import OptionParser
 import random
@@ -286,12 +286,7 @@ class WebSocketHandshake(object):
 
         # 4.1 43. let /expected/ be the MD5 fingerprint of /challenge/ as a
         # big-endian 128 bit string.
-        if _HAS_HASHLIB:
-            md5_hash = hashlib.md5()
-            md5_hash.update(challenge)
-            expected = md5_hash.digest()
-        else:
-            expected = md5.md5(challenge).digest()
+        expected = md5_hash(challenge).digest()
         logging.info("expected : %s" % _hexify(expected))
 
         # 4.1 44. read sixteen bytes from the server.

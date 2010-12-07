@@ -490,7 +490,7 @@ class EchoClient(object):
 
             self._handshake.handshake()
 
-            logging.info('Established')
+            logging.info('Connection established')
 
             for line in self._options.message.split(','):
                 frame = self._create_text_frame(line)

@@ -60,7 +60,8 @@ class EndToEndTest(unittest.TestCase):
 
     def _kill_process(self, pid):
         if sys.platform in ('win32', 'cygwin'):
-            subprocess.call(('taskkill.exe', '/f', '/pid', str(pid)), close_fds=True)
+            subprocess.call(
+                ('taskkill.exe', '/f', '/pid', str(pid)), close_fds=True)
         else:
             os.kill(pid, signal.SIGKILL)
 
@@ -83,8 +84,8 @@ class EndToEndTest(unittest.TestCase):
             server = self._run_server(
                 [self.standalone_command, '-p', str(self.test_port),
                  '-d', self.document_root])
-            # TODO(tyoshino): add some logic to poll the server until it becomes
-            # ready
+            # TODO(tyoshino): add some logic to poll the server until it
+            # becomes ready
             time.sleep(0.2)
             client = self._run_client(
                 [self.echo_client_command, '-p', str(self.test_port),
@@ -127,7 +128,8 @@ class EndToEndTest(unittest.TestCase):
                  '-r', '/echo', '-m', 'test',
                  '--protocol-version', 'hybi00'])
             actual = self._get_client_output(client)
-            self.assertEqual('Send: test\nRecv: test\nSend close\nRecv ack\n', actual)
+            self.assertEqual(
+                'Send: test\nRecv: test\nSend close\nRecv ack\n', actual)
             client.wait()
         finally:
             self._kill_process(server.pid)

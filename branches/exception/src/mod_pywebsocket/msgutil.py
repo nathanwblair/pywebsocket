@@ -72,13 +72,6 @@ class InvalidFrameException(ConnectionTerminatedException):
     pass
 
 
-class BadArgumentException(RuntimeError):
-    """This exception will be raised when bad arguments are supplied to frame
-    creation utilities.
-    """
-    pass
-
-
 class BadOperationException(RuntimeError):
     """This exception will be raised when send_message() is called on
     server-terminated connection or receive_message() is called on
@@ -162,11 +155,11 @@ def create_length_header(length, rsv4):
     """Creates a length header.
 
     Raises:
-        BadArgumentException: when bad data is given.
+        ValueError: when bad data is given.
     """
 
     if rsv4 != 0 and rsv4 != 1:
-        raise BadArgumentException('rsv4 must be 0 or 1')
+        raise ValueError('rsv4 must be 0 or 1')
 
     header = ''
 
@@ -180,7 +173,7 @@ def create_length_header(length, rsv4):
         second_byte = rsv4 << 7 | 127
         header += chr(second_byte) + struct.pack('!Q', length)
     else:
-        raise BadArgumentException('Payload is too big for one frame')
+        raise ValueError('Payload is too big for one frame')
 
     return header
 
@@ -193,13 +186,13 @@ def create_header(opcode, payload_length, more, rsv1, rsv2, rsv3, rsv4):
     """
 
     if opcode < 0 or 0xf < opcode:
-        raise BadArgumentException('Opcode out of range')
+        raise ValueError('Opcode out of range')
 
     if payload_length < 0 or 1 << 63 <= payload_length:
-        raise BadArgumentException('payload_length out of range')
+        raise ValueError('payload_length out of range')
 
     if (more | rsv1 | rsv2 | rsv3 | rsv4) & ~1:
-        raise BadArgumentException('Reserved bit parameter must be 0 or 1')
+        raise ValueError('Reserved bit parameter must be 0 or 1')
 
     header = ''
 

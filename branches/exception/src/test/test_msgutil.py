@@ -208,17 +208,17 @@ class MessageTestHixie75(unittest.TestCase):
         self.assertEqual('\x04\x7f\x7f\xff\xff\xff\xff\xff\xff\xff', header)
 
         # Invalid opcode 0x10
-        self.assertRaises(msgutil.BadArgumentException,
+        self.assertRaises(ValueError,
                           msgutil.create_header,
                           0x10, 0, 0, 0, 0, 0, 0)
 
         # Invalid value 0xf passed to more parameter
-        self.assertRaises(msgutil.BadArgumentException,
+        self.assertRaises(ValueError,
                           msgutil.create_header,
                           msgutil.OPCODE_TEXT, 0, 0xf, 0, 0, 0, 0)
 
         # Too long payload_length
-        self.assertRaises(msgutil.BadArgumentException,
+        self.assertRaises(ValueError,
                           msgutil.create_header,
                           msgutil.OPCODE_TEXT, 1 << 63, 0, 0, 0, 0, 0)
 

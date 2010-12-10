@@ -145,10 +145,10 @@ class Handshaker(object):
         draft = self._request.headers_in.get('Sec-WebSocket-Draft')
         if draft is not None:
             try:
-                draftInt = int(draft)
-                if draftInt < 0:
+                draft_int = int(draft)
+                if draft_int < 0:
                     raise ValueError
-                if draftInt >= 1:
+                if draft_int >= 1:
                     # Make this default when ready.
                     self._logger.debug('IETF HyBi 01 framing')
                     self._request.ws_stream = stream.Stream(self._request)

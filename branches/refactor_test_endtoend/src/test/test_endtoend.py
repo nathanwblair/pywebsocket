@@ -88,7 +88,7 @@ class EndToEndTest(unittest.TestCase):
 
     def test_echo(self):
         try:
-            server = _run_server()
+            server = self._run_server()
 
             # TODO(tyoshino): add some logic to poll the server until it becomes
             # ready
@@ -112,7 +112,7 @@ class EndToEndTest(unittest.TestCase):
 
     def test_echo_server_close(self):
         try:
-            server = _run_server()
+            server = self._run_server()
 
             time.sleep(0.2)
 
@@ -135,7 +135,7 @@ class EndToEndTest(unittest.TestCase):
 
     def test_echo_hybi00(self):
         try:
-            server = _run_server()
+            server = self._run_server()
 
             time.sleep(0.2)
 
@@ -157,7 +157,7 @@ class EndToEndTest(unittest.TestCase):
 
     def test_echo_server_close_hybi00(self):
         try:
-            server = _run_server()
+            server = self._run_server()
 
             time.sleep(0.2)
 
@@ -180,7 +180,7 @@ class EndToEndTest(unittest.TestCase):
 
     def test_echo_hixie75(self):
         try:
-            server = _run_server_allow_draft75()
+            server = self._run_server_allow_draft75()
 
             time.sleep(0.2)
 
@@ -197,7 +197,7 @@ class EndToEndTest(unittest.TestCase):
 
     def test_echo_server_close_hixie75(self):
         try:
-            server = _run_server_allow_draft75()
+            server = self._run_server_allow_draft75()
 
             time.sleep(0.2)
 

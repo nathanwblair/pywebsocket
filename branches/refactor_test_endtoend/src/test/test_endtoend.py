@@ -94,7 +94,7 @@ class EndToEndTest(unittest.TestCase):
             # ready
             time.sleep(0.2)
 
-            client = client_for_testing.Client(self._options)
+            client = client_for_testing.create_client(self._options)
             try:
                 client.connect()
 
@@ -116,7 +116,7 @@ class EndToEndTest(unittest.TestCase):
 
             time.sleep(0.2)
 
-            client = client_for_testing.Client(self._options)
+            client = client_for_testing.create_client(self._options)
             try:
                 client.connect()
 
@@ -139,7 +139,7 @@ class EndToEndTest(unittest.TestCase):
 
             time.sleep(0.2)
 
-            client = client_for_testing.ClientHybi00(self._options)
+            client = client_for_testing.create_client_hybi00(self._options)
             try:
                 client.connect()
 
@@ -161,7 +161,7 @@ class EndToEndTest(unittest.TestCase):
 
             time.sleep(0.2)
 
-            client = client_for_testing.ClientHybi00(self._options)
+            client = client_for_testing.create_client_hybi00(self._options)
             try:
                 client.connect()
 
@@ -184,7 +184,7 @@ class EndToEndTest(unittest.TestCase):
 
             time.sleep(0.2)
 
-            client = client_for_testing.ClientHybi00(self._options)
+            client = client_for_testing.create_client_hixie75(self._options)
             try:
                 client.connect()
 
@@ -201,7 +201,7 @@ class EndToEndTest(unittest.TestCase):
 
             time.sleep(0.2)
 
-            client = client_for_testing.ClientHybi00(self._options)
+            client = client_for_testing.create_client_hixie75(self._options)
             try:
                 client.connect()
 
@@ -210,8 +210,6 @@ class EndToEndTest(unittest.TestCase):
 
                 client.send_message(_GOODBYE_MESSAGE)
                 client.assert_receive(_GOODBYE_MESSAGE)
-
-                client.assert_connection_closed()
             finally:
                 client.close_socket()
         finally:

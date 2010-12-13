@@ -60,9 +60,9 @@ _DEFAULT_PORT = 80
 _DEFAULT_SECURE_PORT = 443
 
 # Opcodes introduced in IETF HyBi 01 for the new framing format
-_OPCODE_CONTINUATION = 1
-_OPCODE_CLOSE = 1
-_OPCODE_TEXT = 4
+_OPCODE_CONTINUATION = 0x0
+_OPCODE_CLOSE        = 0x1
+_OPCODE_TEXT         = 0x4
 
 
 def _method_line(resource):
@@ -441,49 +441,44 @@ class WebSocketHixie75Handshake(WebSocketHandshake):
         self._skip_headers()
 
 
-class ClientOptions(object):
-    def __init__(self):
-        self.server_host = ''
-        self.origin = ''
-        self.resource = ''
-        self.server_port = -1
-        self.socket_timeout = 1000
-        self.use_tls = False
+class WebSocketStream(object):
+    """WebSocket frame processor for IETF HyBi 00 or later."""
 
+    _CLOSE_FRAME = chr(_OPCODE_CLOSE) + '\x00'
 
-class Client(object):
-    """Web Socket echo client."""
-
-    def __init__(self, options):
-        self._options = options
-        self._socket = None
+    def __init__(self, socket):
+        self._socket = socket
 
         self._fragmented = False
 
-    def _create_handshake(self):
-        return WebSocketHandshake(self._socket, self._options)
+    def send_text(self, payload, end=True):
+        encoded_payload = payload.encode('utf-8')
 
-    def connect(self):
-        self._socket = socket.socket()
-        self._socket.settimeout(self._options.socket_timeout)
+        if self._fragmented:
+            first_byte = _OPCODE_CONTINUATION
+        else:
+            first_byte = _OPCODE_TEXT
 
-        self._socket.connect((self._options.server_host,
-                              self._options.server_port))
-        if self._options.use_tls:
-            self._socket = _TLSSocket(self._socket)
+        if end:
+            self._fragmented = False
+        else:
+            self._fragmented = True
+            first_byte |= 0x80
 
-        self._handshake = self._create_handshake()
+        header = chr(first_byte)
+        payload_length = len(encoded_payload)
+        if payload_length <= 125:
+            header += chr(payload_length)
+        elif payload_length < 1 << 16:
+            header += chr(126) + struct.pack('!H', payload_length)
+        elif payload_length < 1 << 63:
+            header += chr(127) + struct.pack('!Q', payload_length)
+        else:
+            raise Exception('Too long payload (%d byte)' % payload_length)
+        self._socket.send(header + encoded_payload)
 
-        self._handshake.handshake()
-
-        logging.info('Connection established')
-
-    def send_message(self, message, end=True):
-        frame = self._create_text_frame(message, end)
-        self._socket.send(frame)
-
-    def assert_receive(self, payload, opcode=_OPCODE_TEXT, more=0,
-                       rsv1=0, rsv2=0, rsv3=0, rsv4=0):
+    def assert_receive_text(self, payload, opcode=_OPCODE_TEXT, more=0,
+                            rsv1=0, rsv2=0, rsv3=0, rsv4=0):
         received = _receive_bytes(self._socket, 2)
 
         first_byte = ord(received[0])
@@ -538,7 +533,29 @@ class Client(object):
                 'Unexpected payload : %r (expected) vs %r (actual)' %
                 (payload, data))
 
-    def assert_receive_hixie75(self, payload):
+    def send_close(self):
+        self._socket.send(self._CLOSE_FRAME)
+
+    def assert_receive_close(self):
+        closing = _receive_bytes(self._socket, len(self._CLOSE_FRAME))
+        if closing != self._CLOSE_FRAME:
+            raise Exception('Didn\'t receive closing handshake')
+
+
+class WebSocketStreamHixie75(object):
+    """WebSocket frame processor for Hixie 75 and IETF HyBi 00."""
+
+    _CLOSE_FRAME = '\xff\x00'
+
+    def __init__(self, socket):
+        self._socket = socket
+
+    def send_text(self, payload, unused_end):
+        encoded_payload = payload.encode('utf-8')
+        frame = ''.join(['\x00', encoded_payload, '\xff'])
+        self._socket.send(frame)
+
+    def assert_receive_text(self, payload):
         received = _receive_bytes(self._socket, 1)
 
         if received != '\x00':
@@ -557,100 +574,90 @@ class Client(object):
                 'Unexpected payload : %r (expected) vs %r (actual)' %
                 (payload, received[0:-1]))
 
-    def assert_connection_closed(self):
-        try:
-            _ = self._receive_bytes(self._socket, 1)
-        except:
-            return
+    def send_close(self):
+        self._socket.send(self._CLOSE_FRAME)
 
-        raise Exception('Connection is not closed')
+    def assert_receive_close(self):
+        closing = _receive_bytes(self._socket, len(self._CLOSE_FRAME))
+        if closing != self._CLOSE_FRAME:
+            raise Exception('Didn\'t receive closing handshake')
+
+
+class ClientOptions(object):
+    def __init__(self):
+        self.server_host = ''
+        self.origin = ''
+        self.resource = ''
+        self.server_port = -1
+        self.socket_timeout = 1000
+        self.use_tls = False
+
+
+class Client(object):
+    """Web Socket client."""
+
+    def __init__(self, options, handshake_class, stream_class):
+        self._options = options
+        self._socket = None
+
+        self._handshake_class = handshake_class
+        self._stream_class = stream_class
+
+    def connect(self):
+        self._socket = socket.socket()
+        self._socket.settimeout(self._options.socket_timeout)
+
+        self._socket.connect((self._options.server_host,
+                              self._options.server_port))
+        if self._options.use_tls:
+            self._socket = _TLSSocket(self._socket)
+
+        self._handshake = self._handshake_class(self._socket, self._options)
+
+        self._handshake.handshake()
+
+        self._stream = self._stream_class(self._socket)
+
+        logging.info('Connection established')
+
+    def send_message(self, message, end=True):
+        self._stream.send_text(message, end)
+
+    def assert_receive(self, payload):
+        self._stream.assert_receive_text(payload)
+
+    def send_close(self):
+        self._stream.send_close()
+
+    def assert_receive_close(self):
+        self._stream.assert_receive_close()
 
     def close_socket(self):
         self._socket.close()
 
-    def send_close_generic(self, closing_frame):
-        self._socket.send(closing_frame)
+    def assert_connection_closed(self):
+        try:
+            _ = _receive_bytes(self._socket, 1)
+        except Exception, e:
+            if str(e) != 'connection closed unexpectedly':
+                raise
+            return
 
-    def assert_receive_close_generic(self, closing_frame):
-        closing = _receive_bytes(self._socket, len(closing_frame))
-        if closing != closing_frame:
-            raise Exception('Didn\'t receive closing handshake')
-
-    def _create_text_frame(self, payload, end):
-        encoded_payload = payload.encode('utf-8')
-
-        if self._fragmented:
-            first_byte = _OPCODE_CONTINUATION
-        else:
-            first_byte = _OPCODE_TEXT
-
-        if end:
-            self._fragmented = False
-        else:
-            self._fragmented = True
-            first_byte |= 0x80
-
-        header = chr(first_byte)
-        payload_length = len(encoded_payload)
-        if payload_length <= 125:
-            header += chr(payload_length)
-        elif payload_length < 1 << 16:
-            header += chr(126) + struct.pack('!H', payload_length)
-        elif payload_length < 1 << 63:
-            header += chr(127) + struct.pack('!Q', payload_length)
-        else:
-            raise Exception('Too long payload (%d byte)' % payload_length)
-        return header + encoded_payload
-
-    def _create_text_frame_hixie75(self, payload):
-        encoded_payload = payload.encode('utf-8')
-        return ''.join(['\x00', encoded_payload, '\xff'])
-
-    def send_close(self):
-        self.send_close_generic(chr(_OPCODE_CLOSE) + '\x00')
-
-    def assert_receive_close(self):
-        self.assert_receive_close_generic(chr(_OPCODE_CLOSE) + '\x00')
+        raise Exception('Connection is not closed')
 
 
-class ClientHybi00(Client):
-    """Web Socket echo client using IETF HyBi 00 protocol."""
-
-    def __init__(self, options):
-        Client.__init__(self, options)
-
-    def _create_handshake(self):
-        return WebSocketHybi00Handshake(self._socket, self._options)
-
-    def send_message(self, message, end=True):
-        frame = self._create_text_frame_hixie75(message)
-        self._socket.send(frame)
-
-    def assert_receive(self, message):
-        self.assert_receive_hixie75(message)
-
-    def send_close(self):
-        self.send_close_generic('\xff\x00')
-
-    def assert_receive_close(self):
-        self.assert_receive_close_generic('\xff\x00')
+def create_client(options):
+    return Client(options, WebSocketHandshake, WebSocketStream)
 
 
-class ClientHixie75(Client):
-    """Web Socket echo client using Hixie 75 protocol."""
+def create_client_hybi00(options):
+    return Client(
+        options, WebSocketHybi00Handshake, WebSocketStreamHixie75)
 
-    def __init__(self, options):
-        Client.__init__(self, options)
 
-    def _create_handshake(self):
-        return WebSocketHixie75Handshake(self._socket, self._options)
-
-    def send_message(self, message, end=True):
-        frame = self._create_text_frame_hixie75(message)
-        self._socket.send(frame)
-
-    def assert_receive(self, message):
-        self.assert_receive_hixie75(message)
+def create_client_hixie75(options):
+    return Client(
+        options, WebSocketHixie75Handshake, WebSocketStreamHixie75)
 
 
 # vi:sts=4 sw=4 et

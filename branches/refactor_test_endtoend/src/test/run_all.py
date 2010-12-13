@@ -31,6 +31,9 @@
 
 
 """Run all tests in the same directory.
+
+This suite is expected to be run under pywebsocket's src directory, i.e. the
+directory containing mod_pywebsocket, test, etc.
 """
 
 

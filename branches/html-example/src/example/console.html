@@ -87,20 +87,20 @@ function init() {
   logBox = document.getElementById('log');
   messageBox = document.getElementById('message');
 
-  addressBox.value = defaultAddress
+  addressBox.value = defaultAddress;
 }
 </script>
 </head>
 <body onload="init()">
 
-<form action="#" onsubmit="connect(); return false">
+<form action="#" onsubmit="connect(); return false;">
 <input type="text" id="address" size="40">
 <input type="submit" value="connect">
 </form>
 
 <textarea id="log" rows="10" cols="40" readonly></textarea>
 
-<form action="#" onsubmit="send(); return false">
+<form action="#" onsubmit="send(); return false;">
 <input type="text" id="message" size="40">
 <input type="submit" value="send">
 </form>

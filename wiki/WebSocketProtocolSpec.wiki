@@ -97,11 +97,38 @@ Tiny changes
 
 = Rationale =
 
+== Use GET method ==
+
 == Challenge/response in opening handshake ==
 
-  * [http://www.ietf.org/mail-archive/web/hybi/current/msg01198.html Maciej's post]
+  * Prevent cross protocol attack
+    * [http://www.ietf.org/mail-archive/web/hybi/current/msg01198.html Maciej's post]
+
+== Use frame length, not sentinel based as Hixie 75 ==
+
+  * Support binary frame
+  * Use only one method to identify frame boundary to keep framing simple
+
+== Fragmentation ===
+
+  * Sending dynamically generated contents efficiently
+    * [http://www6.ietf.org/mail-archive/web/hybi/current/msg03759.html John's post] "As Greg mentioned, generating ..."
+  * Necessary for multiplexing
+
+  * Only FIN bit or combination of FIN bit and continuous opcode?
+
+== 3-mode encoding on frame length field ==
+
+  * Small overhead for short frame
+  * Support huge frame (63 bit)
+    * [http://www.ietf.org/mail-archive/web/hybi/current/msg03085.html Maciej's post]
+  * [https://www.google.com/moderator/#15/e=2809f&t=2809f.40&f=2809f.7beeb Informal poll on frame encoding schemes (Google Moderator)]
+  * The number of reserved bits we can get was also the point of the argument
 
 == Frame masking ==
+
+  * WebSocket can be abused to poisoning HTTP proxy unless we mask data so that attacker's script cannot control what is sent over TCP.
+    * Lin-Shung et. al, Transparent Proxies: Threat or Menace? http://www.adambarth.com/experimental/websocket.pdf
 
 == Closing handshake ==
 
@@ -116,10 +143,15 @@ Tiny changes
   * [http://www.ietf.org/mail-archive/web/hybi/current/msg04117.html Revised proposal]
   * [http://www.ietf.org/mail-archive/web/hybi/current/msg04071.html First proposal by Patrick] Compress only applied to the application data portion
 
+== Not NPN ==
+
+  * SNI is not well deployed
+
+== TLS only is not acceptable ==
+
 = Other proposals =
 
   * http://tools.ietf.org/id/draft-abarth-thewebsocketprotocol-01.txt Opening handshake with CONNECT method, AES based frame masking by Adam Barth
-    * Rationale : Lin-Shung et. al, Transparent Proxies: Threat or Menace? http://www.adambarth.com/experimental/websocket.pdf
   * http://tools.ietf.org/html/draft-montenegro-hybi-upgrade-hello-handshake-00 Gabriel's proposal
   * http://www.whatwg.org/specs/web-socket-protocol/ Last proposal Hixie published before he took over editor to Ian Fette.
 

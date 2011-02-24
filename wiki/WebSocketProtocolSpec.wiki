@@ -126,6 +126,8 @@ Prevent cross protocol attack using XMLHttpRequest. XMLHttpRequest interface doe
   * Small overhead for short frame
   * Support huge frame (63 bit)
     * [http://www.ietf.org/mail-archive/web/hybi/current/msg03085.html Maciej's post]
+  * 63 bit, not 64 bit since some environments doesn't support unsigned 64 bit data type
+    * [http://www.ietf.org/mail-archive/web/hybi/current/msg03030.html Greg's post]
   * [https://www.google.com/moderator/#15/e=2809f&t=2809f.40&f=2809f.7beeb Informal poll on frame encoding schemes (Google Moderator)]
   * The number of reserved bits we can get was also the point of the argument
 

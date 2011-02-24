@@ -131,7 +131,7 @@ Prevent cross protocol attack using XMLHttpRequest. XMLHttpRequest interface doe
 
 == Frame masking ==
 
-  * WebSocket can be abused to poisoning HTTP proxy unless we mask data so that attacker's script cannot control what is sent over TCP.
+  * !WebSocket can be abused to poisoning HTTP proxy unless we mask data so that attacker's script cannot control what is sent over TCP.
     * Lin-Shung et. al, Transparent Proxies: Threat or Menace? http://www.adambarth.com/experimental/websocket.pdf
 
 == Closing handshake ==

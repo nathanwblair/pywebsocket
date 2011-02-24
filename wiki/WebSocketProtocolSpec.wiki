@@ -44,10 +44,14 @@ Tiny changes
   * Changed subprotocols separator from SP to ','
   * Removed Sec-!WebSocket-Location
 
-=== Introduced library dependency ===
+=== Library dependency ===
 
+Introduced
   * BASE64
   * SHA-1
+
+Eliminated
+  * MD5
 
 == !HyBi 03 ==
 
@@ -58,6 +62,11 @@ Tiny changes
   * Added one known extension "compression"
   * Added close frame body matching step to closing handshake
     * To distinguish close frames among virtual channels in multiplexed connection
+
+=== Library dependency ===
+
+Introduced
+  * DEFLATE
 
 === Note ===
 
@@ -90,6 +99,11 @@ Tiny changes
 
   * Added challenge/response handshaking using binary data
   * Added closing handshake
+
+=== Library dependency ===
+
+Introduced
+  * MD5
 
 == Hixie 75 ==
 

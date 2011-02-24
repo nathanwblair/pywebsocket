@@ -49,7 +49,55 @@ Tiny changes
   * BASE64
   * SHA-1
 
+== !HyBi 03 ==
+
+  * [http://tools.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-03.txt Spec]
+
+=== Change ===
+
+  * Added one known extension "compression"
+  * Added close frame body matching step to closing handshake
+    * To distinguish close frames among virtual channels in multiplexed connection
+
+=== Note ===
+
+  * The value of Sec-!WebSocket-Draft is still 2
+
+== !HyBi 02 ==
+
+  * [http://tools.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-02.txt Spec]
+
+=== Change ===
+
+  * Added /defer cookies/ flag
+  * Added Sec-!WebSocket-Draft with a value of 2
+
+== !HyBi 01 ==
+
+  * [http://tools.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-01.txt Spec]
+
+=== Change ===
+
+  * Changed frame format
+  * Added extension mechanism (no negotiation yet)
+
+== Hixie 76 (!HyBi 00) ==
+
+  * [http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-00 HyBi 00]
+  * [http://tools.ietf.org/html/draft-hixie-thewebsocketprotocol-76 Hixie 76]
+
+=== Change ===
+
+  * Added challenge/response handshaking using binary data
+  * Added closing handshake
+
 = Rationale =
+
+== Challenge/response in opening handshake ==
+
+  * [http://www.ietf.org/mail-archive/web/hybi/current/msg01198.html Maciej's post]
+
+== Frame masking ==
 
 == Closing handshake ==
 
@@ -61,7 +109,14 @@ Tiny changes
 
 = Other proposals =
 
+  * http://tools.ietf.org/id/draft-abarth-thewebsocketprotocol-01.txt Opening handshake with CONNECT method, AES based frame masking by Adam Barth
+    * Rationale : Lin-Shung et. al, Transparent Proxies: Threat or Menace? http://www.adambarth.com/experimental/websocket.pdf
+  * http://tools.ietf.org/html/draft-montenegro-hybi-upgrade-hello-handshake-00 Gabriel's proposal
+  * http://www.whatwg.org/specs/web-socket-protocol/ Last proposal Hixie published before he took over editor to Ian Fette.
 
-= References =
+= References/Tools =
 
   * [http://www.ietf.org/mail-archive/web/hybi/current/maillist.html HyBi mailing list archive]
+  * [https://datatracker.ietf.org/doc/draft-ietf-hybi-thewebsocketprotocol/history/ IETF datatracker] Useful for getting side-by-side diff between drafts
+  * [http://trac.tools.ietf.org/wg/hybi/trac/log/websocket/draft-ietf-hybi-thewebsocketprotocol.xml Latest draft on IETF Subversion]
+  * [http://trac.tools.ietf.org/wg/hybi/trac/wiki/HandshakeProposals Proposal list on HyBi wiki]

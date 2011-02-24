@@ -1,8 +1,8 @@
-This is a note by pywebsocket developers for catching up changes on the spec and tracking discussion on HyBi. This may also be useful for people who are interested in WebSocket protocol design to quickly catch up the history of discussion on HyBi and understand what/why/when a certain decision has been made.
+This is a note by pywebsocket developers for catching up changes on the spec and tracking discussion on !HyBi. This may also be useful for people who are interested in !WebSocket protocol design to quickly catch up the history of discussion on !HyBi and understand what/why/when a certain decision has been made.
 
 = Official working drafts =
 
-== HyBi 05 ==
+== !HyBi 05 ==
 
   * [http://tools.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-05.txt Spec]
   * [http://tools.ietf.org/rfcdiff?url2=draft-ietf-hybi-thewebsocketprotocol-05 Diff from 04]
@@ -23,5 +23,45 @@ Typos, remanet removal
 Trivial changes
   * The value of Sec-!WebSocket-Version is now 5
 
+== !HyBi 04 ==
+
+  * [http://tools.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-04.txt Spec]
+
+=== Change ===
+
+Major changes
+  * Added frame masking
+  * Changed opening handshake
+    * Sec-!WebSocket-Key1, Sec-!WebSocket-Key2, key3, response -> Sec-!WebSocket-Key, Sec-!WebSocket-Nonce, Sec-!WebSocket-Accept)
+  * Added Sec-!WebSocket-Extensions for extension negotiation
+  * Upgrade header is now case-insensitive (HTTP compliant)
+  * Flipped MORE bit and renamed it to FIN bit
+
+Tiny changes
+  * Renamed Sec-!WebSocket-Draft to Sec-!WebSocket-Version
+  * Renamed Origin to Sec-!WebSocket-Origin
+  * Added ABNF (one used in HTTP RFC2616) clarification to Sec-!WebSocket-Protocol
+  * Changed subprotocols separator from SP to ','
+  * Removed Sec-!WebSocket-Location
+
+=== Introduced library dependency ===
+
+  * BASE64
+  * SHA-1
+
+= Rationale =
+
+== Closing handshake ==
+
+  * [http://www.ietf.org/mail-archive/web/hybi/current/msg01137.html Prevent RST hazard] "Please note: The close-frame ..."
+  * Allow a peer to confirm that the peer has received all data
+  * Allow a peer to confirm that the other peer has received all data (This feature has been dropped)
+
+  * [http://www.ietf.org/mail-archive/web/hybi/current/msg01526.html Use closing handshake instead of TCP shutdown] "I think the net result is ..."
 
 = Other proposals =
+
+
+= References =
+
+  * [http://www.ietf.org/mail-archive/web/hybi/current/maillist.html HyBi mailing list archive]

@@ -91,6 +91,10 @@ Tiny changes
   * Added challenge/response handshaking using binary data
   * Added closing handshake
 
+== Hixie 75 ==
+
+  * [http://tools.ietf.org/html/draft-hixie-thewebsocketprotocol-75 Spec]
+
 = Rationale =
 
 == Challenge/response in opening handshake ==
@@ -106,6 +110,11 @@ Tiny changes
   * Allow a peer to confirm that the other peer has received all data (This feature has been dropped)
 
   * [http://www.ietf.org/mail-archive/web/hybi/current/msg01526.html Use closing handshake instead of TCP shutdown] "I think the net result is ..."
+
+== deflate-stream extension ==
+
+  * [http://www.ietf.org/mail-archive/web/hybi/current/msg04117.html Revised proposal]
+  * [http://www.ietf.org/mail-archive/web/hybi/current/msg04071.html First proposal by Patrick] Compress only applied to the application data portion
 
 = Other proposals =
 

@@ -99,6 +99,10 @@ Tiny changes
 
 == Use GET method ==
 
+== What's Sec- ==
+
+Prevent cross protocol attack using XMLHttpRequest. XMLHttpRequest interface doesn't allow us to send fields with Sec- prefix.
+
 == Challenge/response in opening handshake ==
 
   * Prevent cross protocol attack
@@ -111,7 +115,7 @@ Tiny changes
 
 == Fragmentation ===
 
-  * Sending dynamically generated contents efficiently
+  * Sending dynamically generated contents efficiently without queuing data until all the data of a message is available (without waiting until we know the size of application data that we need to write length field)
     * [http://www6.ietf.org/mail-archive/web/hybi/current/msg03759.html John's post] "As Greg mentioned, generating ..."
   * Necessary for multiplexing
 
@@ -148,6 +152,12 @@ Tiny changes
   * SNI is not well deployed
 
 == TLS only is not acceptable ==
+
+  * TLS only, then no need to mask frame
+
+No.
+
+  * In some countries, censoring is required by law e.g. filtering porn in school
 
 = Other proposals =
 

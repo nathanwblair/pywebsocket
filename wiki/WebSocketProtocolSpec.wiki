@@ -111,69 +111,7 @@ Introduced
 
 = Rationale =
 
-== Use GET method ==
-
-== What's Sec- ==
-
-Prevent cross protocol attack using XMLHttpRequest. XMLHttpRequest interface doesn't allow us to send fields with Sec- prefix.
-
-== Challenge/response in opening handshake ==
-
-  * Prevent cross protocol attack
-    * [http://www.ietf.org/mail-archive/web/hybi/current/msg01198.html Maciej's post]
-
-== Use frame length, not sentinel based as Hixie 75 ==
-
-  * Support binary frame
-  * Use only one method to identify frame boundary to keep framing simple
-
-== Fragmentation ===
-
-  * Sending dynamically generated contents efficiently without queuing data until all the data of a message is available (without waiting until we know the size of application data that we need to write length field)
-    * [http://www6.ietf.org/mail-archive/web/hybi/current/msg03759.html John's post] "As Greg mentioned, generating ..."
-  * Necessary for multiplexing
-
-  * Only FIN bit or combination of FIN bit and continuous opcode?
-
-== 3-mode encoding on frame length field ==
-
-  * Small overhead for short frame
-  * Support huge frame (63 bit)
-    * [http://www.ietf.org/mail-archive/web/hybi/current/msg03085.html Maciej's post]
-  * 63 bit, not 64 bit since some environments doesn't support unsigned 64 bit data type
-    * [http://www.ietf.org/mail-archive/web/hybi/current/msg03030.html Greg's post]
-  * [https://www.google.com/moderator/#15/e=2809f&t=2809f.40&f=2809f.7beeb Informal poll on frame encoding schemes (Google Moderator)]
-  * The number of reserved bits we can get was also the point of the argument
-
-== Frame masking ==
-
-  * !WebSocket can be abused to poisoning HTTP proxy unless we mask data so that attacker's script cannot control what is sent over TCP.
-    * Lin-Shung et. al, Transparent Proxies: Threat or Menace? http://www.adambarth.com/experimental/websocket.pdf
-
-== Closing handshake ==
-
-  * [http://www.ietf.org/mail-archive/web/hybi/current/msg01137.html Prevent RST hazard] "Please note: The close-frame ..."
-  * Allow a peer to confirm that the peer has received all data
-  * Allow a peer to confirm that the other peer has received all data (This feature has been dropped)
-
-  * [http://www.ietf.org/mail-archive/web/hybi/current/msg01526.html Use closing handshake instead of TCP shutdown] "I think the net result is ..."
-
-== deflate-stream extension ==
-
-  * [http://www.ietf.org/mail-archive/web/hybi/current/msg04117.html Revised proposal]
-  * [http://www.ietf.org/mail-archive/web/hybi/current/msg04071.html First proposal by Patrick] Compress only applied to the application data portion
-
-== Not NPN ==
-
-  * SNI is not well deployed
-
-== TLS only is not acceptable ==
-
-  * TLS only, then no need to mask frame
-
-No.
-
-  * In some countries, censoring is required by law e.g. filtering porn in school
+Contents placed here has been merged into [http://trac.tools.ietf.org/wg/hybi/trac/wiki/FAQ FAQ on the IETF HyBi WG site].
 
 = Other proposals =
 

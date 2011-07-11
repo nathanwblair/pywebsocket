@@ -11,6 +11,7 @@ This is a note by pywebsocket developers for catching up changes on the spec and
 
 Semantic changes
   * On receiving a frame with any of RSV1-3 raised but no extension negotiated, Fail the WebSocket Connection.
+  ** It seems that unknown opcode will also result in Fail in !HyBi 10 (TBD)
 
 Note
   * Sec-WebSocket-Version value is still 8

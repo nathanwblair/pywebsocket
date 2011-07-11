@@ -2,6 +2,11 @@ This is a note by pywebsocket developers for catching up changes on the spec and
 
 = Official working drafts =
 
+== !HyBi 10 ==
+
+  * [http://www.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-10.txt Spec]
+  * [http://tools.ietf.org/rfcdiff?url2=draft-ietf-hybi-thewebsocketprotocol-10 Diff from 09]
+
 == !HyBi 09 ==
 
   * [http://tools.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-09.txt Spec]

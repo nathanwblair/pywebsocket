@@ -7,6 +7,12 @@ This is a note by pywebsocket developers for catching up changes on the spec and
   * [http://www.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-10.txt Spec]
   * [http://tools.ietf.org/rfcdiff?url2=draft-ietf-hybi-thewebsocketprotocol-10 Diff from 09]
 
+=== Change ===
+
+Semantic changes
+  * Status code 1007.
+  * Receiving strings including invalid UTF-8 result in Fail.
+
 == !HyBi 09 ==
 
   * [http://tools.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-09.txt Spec]
@@ -30,8 +36,9 @@ Semantic changes
   * Absolute path is now allowed for resource
   * extension parameter is token
   * Sec-WebSocket-Protocol from server to client is token
-  * Status code 1005 and 1006
-  * Internal error results in 1005
+  * Status code 1005 and 1006 are added, and all codes are unsigned.
+  * Internal error results in 1006
+  * HTTP fallback status codes are clarified
 
 == !HyBi 07 ==
 

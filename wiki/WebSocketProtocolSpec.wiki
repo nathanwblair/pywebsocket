@@ -13,6 +13,9 @@ Semantic changes
   * Status code 1007.
   * Receiving strings including invalid UTF-8 result in Fail.
 
+Note
+  * Sec-WebSocket-Version value is still 8
+
 == !HyBi 09 ==
 
   * [http://tools.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-09.txt Spec]

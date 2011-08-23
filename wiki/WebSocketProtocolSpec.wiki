@@ -2,6 +2,19 @@ This is a note by pywebsocket developers for catching up changes on the spec and
 
 = Official working drafts =
 
+== !HyBi 11 ==
+
+  * [http://www.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-11.txt Spec]
+  * [http://tools.ietf.org/rfcdiff?url2=draft-ietf-hybi-thewebsocketprotocol-11 Diff from 10]
+
+=== Change ===
+
+Semantic changes
+  * TBD
+
+Note
+  * Sec-WebSocket-Version value is still 8
+
 == !HyBi 10 ==
 
   * [http://www.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-10.txt Spec]

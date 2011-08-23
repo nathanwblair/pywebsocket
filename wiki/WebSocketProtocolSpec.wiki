@@ -10,10 +10,14 @@ This is a note by pywebsocket developers for catching up changes on the spec and
 === Change ===
 
 Semantic changes
-  * TBD
+  * Sec-WebSocket-Origin -> Origin
+  * the client can send Sec-WebSocket-Protocol-Client header in the opening handshake
+  * the client can send Sec-WebSocket-Version-Client header in the opening handshake
+  * the server can send Sec-WebSocket-Protocol-Server header in the opening handshake
+  * the server can send Sec-WebSocket-Version-Server header in the opening handshake
 
 Note
-  * Sec-WebSocket-Version value is still 8
+  * Sec-WebSocket-Version value is still 8, and 9/10/11 were reserved but were not and will not be used.
 
 == !HyBi 10 ==
 

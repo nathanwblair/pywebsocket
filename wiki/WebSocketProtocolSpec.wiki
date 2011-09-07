@@ -2,9 +2,14 @@ This is a note by pywebsocket developers for catching up changes on the spec and
 
 = Official working drafts =
 
+== !HyBi 13 ==
+
+  * [http://tools.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-13 Spec]
+  * [http://tools.ietf.org/rfcdiff?url2=draft-ietf-hybi-thewebsocketprotocol-13 Diff from 12]
+
 == !HyBi 12 ==
 
-  * [http://www.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-12.txt Spec]
+  * [http://tools.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-12.txt Spec]
   * [http://tools.ietf.org/rfcdiff?url2=draft-ietf-hybi-thewebsocketprotocol-12 Diff from 11]
 
 === Change ===
@@ -15,7 +20,7 @@ Note
 
 == !HyBi 11 ==
 
-  * [http://www.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-11.txt Spec]
+  * [http://tools.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-11.txt Spec]
   * [http://tools.ietf.org/rfcdiff?url2=draft-ietf-hybi-thewebsocketprotocol-11 Diff from 10]
 
 === Change ===
@@ -29,7 +34,7 @@ Note
 
 == !HyBi 10 ==
 
-  * [http://www.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-10.txt Spec]
+  * [http://tools.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-10.txt Spec]
   * [http://tools.ietf.org/rfcdiff?url2=draft-ietf-hybi-thewebsocketprotocol-10 Diff from 09]
 
 === Change ===

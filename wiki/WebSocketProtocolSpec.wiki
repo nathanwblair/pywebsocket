@@ -12,6 +12,15 @@ This is a note by pywebsocket developers for catching up changes on the spec and
   * [http://tools.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-14 Spec]
   * [http://tools.ietf.org/rfcdiff?url2=draft-ietf-hybi-thewebsocketprotocol-14 Diff from 13]
 
+Semantic changes
+  * Extension values in extension-param could be quoted-string in addition to token.
+  * Clarify the way to support multiple versions of WebSocket protocol
+  * WebSocket MUST support TLS
+  * Sec-WebSocket-Key and Sec-WebSocketAccept header field MUST NOT appear more than once
+  * Sec-WebSocket-Extensions and Sec-WebSocket-Protocol header filed MAY appear multiple times in requests, but it MUST NOT appear more than once in responses
+  * Sec-WebSocket-Version header filed MAY appear multiple times in responses, but it MUST NOT appear more than once in requests
+  * Status code 1007 was changed
+
 == !HyBi 13 ==
 
   * [http://tools.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-13 Spec]
@@ -19,13 +28,13 @@ This is a note by pywebsocket developers for catching up changes on the spec and
 
 Semantic changes
   * Sec-WebSocket-Version is 13
-  * client must fail the connection on receiving a subprotocol indication that was not present in the client requests in the opening handshake.
+  * Clients must fail the connection on receiving a subprotocol indication that was not present in the client requests in the opening handshake.
   * Status Codes was changes(Change 1004 as reserved, and add 1008, 1009, 1010)
 
 Note
-  * now spec allow to use WWW-Authenticate header and 401 status explicitly
-  * server might redirect the client using a 3xx status code, but client are not required to follow them
-  * client's reconnection on abnormal closure must be delayed (between 0 and 5 seconds is a reasonable initial delay, and subsequent reconnection should be delayed longer by exponential backoff)
+  * Now spec allow to use WWW-Authenticate header and 401 status explicitly
+  * Servers might redirect the client using a 3xx status code, but client are not required to follow them
+  * Clients' reconnection on abnormal closure must be delayed (between 0 and 5 seconds is a reasonable initial delay, and subsequent reconnection should be delayed longer by exponential backoff)
 
 == !HyBi 12 ==
 
@@ -47,7 +56,7 @@ Note
 
 Semantic changes
   * Sec-WebSocket-Origin -> Origin
-  * servers send all supported protocol numbers in Sec-WebSocket-Version header
+  * Servers send all supported protocol numbers in Sec-WebSocket-Version header
 
 Note
   * Sec-WebSocket-Version value is still 8, and 9/10/11 were reserved but were not and will not be used.

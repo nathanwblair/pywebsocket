@@ -2,10 +2,22 @@ This is a note by pywebsocket developers for catching up changes on the spec and
 
 = Official working drafts =
 
+== !HyBi 17 ==
+
+  * [http://tools.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-17 Spec]
+  * [http://tools.ietf.org/rfcdiff?url2=draft-ietf-hybi-thewebsocketprotocol-16 Diff from 16]
+
+Note
+  * Only editorial changes
+  * Sec-WebSocket-Version value is still 13 and this must be the version for RFC
+
 == !HyBi 16 ==
 
   * [http://tools.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-16 Spec]
   * [http://tools.ietf.org/rfcdiff?url2=draft-ietf-hybi-thewebsocketprotocol-16 Diff from 15]
+
+Note
+  * Only editorial changes
 
 == !HyBi 15 ==
 

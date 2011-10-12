@@ -141,6 +141,9 @@ Semantic changes
   * [http://tools.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-06.txt Spec]
   * [http://tools.ietf.org/rfcdiff?url2=draft-ietf-hybi-thewebsocketprotocol-06 Diff from 05]
 
+Major changes
+  * "Connection" header must INCLUDE "Upgrade", rather than is equal to "Upgrade"
+
 == !HyBi 05 ==
 
   * [http://tools.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-05.txt Spec]

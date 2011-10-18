@@ -1,25 +1,23 @@
 = Testing your server implementation using echo_client.py in pywebsocket =
 
-To connect to ws://example.com:12345/test using HyBi 00 version protocol, and send frames "Hello", "foo", "bar" to it, run this:
+For example, to connect to ws://example.com:12345/test using !HyBi 13 version protocol, and send three text frames "Hello", "foo", "bar" to it, run this:
 
 {{{
 svn checkout http://pywebsocket.googlecode.com/svn/trunk/ pywebsocket-read-only
 cd pywebsocket-read-only/src
-PYTHONPATH=. python example/echo_client.py -s example.com -p 12345 -r /test -m Hello,foo,bar --protocol_version=hybi00 --origin=http://example.com:12345/
+PYTHONPATH=. python example/echo_client.py -s example.com -p 12345 -r /test \
+  -m Hello,foo,bar --protocol_version=hybi13 --origin=http://example.com:12345/ \
+  --log-level=debug
 }}}
-
-You can add --log-level=debug to see verbose output for debugging.
 
 = Testing your client implementation using standalone.py in pywebsocket =
 
-To launch pywebsocket standalone server on port 12345 with echo back service on /echo with both HyBi 00 and Hixie 75 protocol support, run this:
+To launch pywebsocket standalone server on port 12345 with echo back service on /echo with !HyBi 13, !HyBi 08, !HyBi 00 and Hixie 75 protocol support, run this:
 
 {{{
 svn checkout http://pywebsocket.googlecode.com/svn/trunk/ pywebsocket-read-only
 cd pywebsocket-read-only/src
-PYTHONPATH=. python mod_pywebsocket/standalone.py -p 12345 --allow-draft75 -d example
+PYTHONPATH=. python mod_pywebsocket/standalone.py -p 12345 --allow-draft75 -d example --log-level debug
 }}}
 
 Open http://localhost:12345/console.html using your client and check if the messages you send are echoed back.
-
-You can add --log-level=debug to see verbose output for debugging.

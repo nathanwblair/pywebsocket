@@ -1,3 +1,4 @@
+#sidebar WebSocketProtocolSpecTOC
 This is a note by pywebsocket developers for catching up changes on the spec and tracking discussion on !HyBi. This may also be useful for people who are interested in !WebSocket protocol design to quickly catch up the history of discussion on !HyBi and understand what/why/when a certain decision has been made.
 
 = Official working drafts =

@@ -252,10 +252,6 @@ Introduced
 
   * [http://tools.ietf.org/html/draft-hixie-thewebsocketprotocol-75 Spec]
 
-= Rationale =
-
-Contents placed here has been merged into [http://trac.tools.ietf.org/wg/hybi/trac/wiki/FAQ FAQ on the IETF HyBi WG site].
-
 = Extension spec drafts =
 
 == WebSocket Per-frame DEFLATE Extension ==
@@ -290,6 +286,10 @@ Contents placed here has been merged into [http://trac.tools.ietf.org/wg/hybi/tr
 
  * [http://tools.ietf.org/html/draft-tamplin-hybi-google-mux-00 Spec]
 
+
+= Rationale =
+
+Contents placed here has been merged into [http://trac.tools.ietf.org/wg/hybi/trac/wiki/FAQ FAQ on the IETF HyBi WG site].
 
 = Other proposals =
 

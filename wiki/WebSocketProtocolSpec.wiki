@@ -256,6 +256,41 @@ Introduced
 
 Contents placed here has been merged into [http://trac.tools.ietf.org/wg/hybi/trac/wiki/FAQ FAQ on the IETF HyBi WG site].
 
+= Extension spec drafts =
+
+== WebSocket Per-frame DEFLATE Extension ==
+
+=== websocket-perframe-deflate-04 ===
+
+ * [http://tools.ietf.org/html/draft-tyoshino-hybi-websocket-perframe-deflate-04 Spec]
+
+=== websocket-perframe-deflate-03 ===
+
+ * [http://tools.ietf.org/html/draft-tyoshino-hybi-websocket-perframe-deflate-03 Spec]
+
+=== websocket-perframe-deflate-02 ===
+
+ * [http://tools.ietf.org/html/draft-tyoshino-hybi-websocket-perframe-deflate-02 Spec]
+
+=== websocket-perframe-deflate-01 ===
+
+ * [http://tools.ietf.org/html/draft-tyoshino-hybi-websocket-perframe-deflate-01 Spec]
+
+=== websocket-perframe-deflate-00 ===
+
+ * [http://tools.ietf.org/html/draft-tyoshino-hybi-websocket-perframe-deflate-00 Spec]
+
+== A Multiplexing Extension for WebSockets ==
+
+=== google-mux-01 ===
+
+ * [http://tools.ietf.org/html/draft-tamplin-hybi-google-mux-01 Spec]
+
+=== google-mux-00 ===
+
+ * [http://tools.ietf.org/html/draft-tamplin-hybi-google-mux-00 Spec]
+
+
 = Other proposals =
 
   * http://tools.ietf.org/id/draft-abarth-thewebsocketprotocol-01.txt Opening handshake with CONNECT method, AES based frame masking by Adam Barth

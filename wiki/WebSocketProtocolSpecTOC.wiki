@@ -19,7 +19,7 @@
   * [WebSocketProtocolSpec#Hixie_76_(_HyBi_00) Hixie 76 (HyBi 00)]
   * [WebSocketProtocolSpec#Hixie_75 Hixie 75]
  * [WebSocketProtocolSpec#Extension_spec_drafts Extension spec drafts]
-  * [WebSocketProtocolSpec#Per-frame_DEFLATE_Extension Per frame DEFLATE Extension]
+  * [WebSocketProtocolSpec#Per-frame_DEFLATE_Extension WebSocket Per-frame DEFLATE Extension]
    * [WebSocketProtocolSpec#websocket-perframe-deflate-04 perframe-deflate-04]
    * [WebSocketProtocolSpec#websocket-perframe-deflate-03 perframe-deflate-03]
    * [WebSocketProtocolSpec#websocket-perframe-deflate-02 perframe-deflate-02]

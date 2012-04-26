@@ -254,7 +254,19 @@ Introduced
 
 = Extension spec drafts =
 
-== WebSocket Per-frame DEFLATE Extension ==
+== Compression ==
+
+=== ietf 00 ===
+
+ * [http://tools.ietf.org/html/draft-ietf-hybi-websocket-perframe-compress-00 Spec]
+
+=== websocket-perframe-deflate-06 ===
+
+ * [http://tools.ietf.org/html/draft-tyoshino-hybi-websocket-perframe-deflate-06 Spec]
+
+=== websocket-perframe-deflate-05 ===
+
+ * [http://tools.ietf.org/html/draft-tyoshino-hybi-websocket-perframe-deflate-05 Spec]
 
 === websocket-perframe-deflate-04 ===
 
@@ -277,6 +289,22 @@ Introduced
  * [http://tools.ietf.org/html/draft-tyoshino-hybi-websocket-perframe-deflate-00 Spec]
 
 == A Multiplexing Extension for WebSockets ==
+
+=== ietf 01 ===
+
+ * [http://tools.ietf.org/html/draft-ietf-hybi-websocket-multiplexing-01 Spec]
+
+=== ietf 00 ===
+
+ * [http://tools.ietf.org/html/draft-ietf-hybi-websocket-multiplexing-00 Spec]
+
+=== google-mux-03 ===
+
+ * [http://tools.ietf.org/html/draft-tamplin-hybi-google-mux-03 Spec]
+
+=== google-mux-02 ===
+
+ * [http://tools.ietf.org/html/draft-tamplin-hybi-google-mux-02 Spec]
 
 === google-mux-01 ===
 

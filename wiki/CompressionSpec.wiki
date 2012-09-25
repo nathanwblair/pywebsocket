@@ -1,0 +1,21 @@
+#Notes for developing compression spec.
+
+= Python zlib snippets =
+
+Sync flush (empty uncompressed block)
+{{{
+import zlib
+c = zlib.compressobj(zlib.Z_DEFAULT_COMPRESSION, zlib.DEFLATED, -zlib.MAX_WBITS)
+b = c.compress('abcdefghijklmnopqrstuvwxyz')
+b += c.flush(zlib.Z_SYNC_FLUSH)
+b
+}}}
+
+Finish with BFINAL
+{{{
+import zlib
+c = zlib.compressobj(zlib.Z_DEFAULT_COMPRESSION, zlib.DEFLATED, -zlib.MAX_WBITS)
+b = c.compress('abcdefghijklmnopqrstuvwxyz')
+b += c.flush(zlib.Z_FINISH)
+b
+}}}

@@ -19,3 +19,18 @@ b = c.compress('abcdefghijklmnopqrstuvwxyz')
 b += c.flush(zlib.Z_FINISH)
 b
 }}}
+
+Hex printing
+{{{
+' '.join(map(lambda x: '0x%02x' % ord(x), b))
+}}}
+
+Decompress
+{{{
+import zlib
+d = zlib.decompressobj(-zlib.MAX_WBITS)
+max_length = 1
+d.decompress(b, max_length)
+d.decompress(d.unconsumed_tail)
+d.unconsumed_tail
+}}}

@@ -1,0 +1,6 @@
+= Benchmark by pywebsocket =
+
+  * Open console.html
+  * Connect to the resource "{{{ws://<host>:<port>/echo_noext}}}".
+  * Check "Show time stamp"
+  * Specify some big file and click send file.

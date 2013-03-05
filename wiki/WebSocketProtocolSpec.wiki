@@ -1,6 +1,23 @@
 #sidebar WebSocketProtocolSpecTOC
 This is a note by pywebsocket developers for catching up changes on the spec and tracking discussion on !HyBi. This may also be useful for people who are interested in !WebSocket protocol design to quickly catch up the history of discussion on !HyBi and understand what/why/when a certain decision has been made.
 
+= Protocol support status of pywebsocket =
+
+pywebsocket supports the following protocols.
+
+  * [http://tools.ietf.org/html/rfc6455 RFC 6455 The WebSocket Protocol]
+    * was also known as [http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-17 draft-ietf-hybi-thewebsocketprotocol-17] (Version 13)
+  * [http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-12 draft-ietf-hybi-thewebsocketprotocol-12] (Version 8)
+  * [http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-00 draft-ietf-hybi-thewebsocketprotocol-00]
+    * equivalent to [http://tools.ietf.org/html/draft-hixie-thewebsocketprotocol-76 draft-hixie-thewebsocketprotocol-76]
+
+and the following extension.
+
+  * [http://tools.ietf.org/html/draft-ietf-hybi-permessage-compression-05 WebSocket Per-message Compression (permessage-deflate)] (To be supported)
+  * [http://tools.ietf.org/html/draft-ietf-hybi-permessage-compression-04 WebSocket Per-message Compression (permessage-compress)] (Deprecated)
+  * [http://tools.ietf.org/html/draft-ietf-hybi-websocket-perframe-compression-04 WebSocket Per-frame Compression (perframe-compress)] (Deprecated)
+  * [http://tools.ietf.org/html/draft-tyoshino-hybi-websocket-perframe-deflate-06 WebSocket Per-frame Compression (deflate-frame)] (Deprecated)
+
 = Official working drafts =
 
 == !HyBi 17 ==

@@ -1,3 +1,4 @@
 # This file is used by gcl to get repository specific information.
 CODE_REVIEW_SERVER: codereview.appspot.com
 CC_LIST: pywebsocket-reviews@googlegroups.com
+VIEW_VC: https://code.google.com/p/pywebsocket/source/detail?r=

@@ -21,3 +21,16 @@ PYTHONPATH=. python mod_pywebsocket/standalone.py -p 12345 --allow-draft75 -d ex
 }}}
 
 Open http://localhost:12345/console.html using your client and check if the messages you send are echoed back.
+
+= Generating Sec-WebSocket-Accept manually =
+
+Use this python code
+
+{{{
+import base64
+import hashlib
+def accept(v):
+  s = hashlib.sha1()
+  s.update(v + '258EAFA5-E914-47DA-95CA-C5AB0DC85B11')
+  return base64.b64encode(s.digest())
+}}}

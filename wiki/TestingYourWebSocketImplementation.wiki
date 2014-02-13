@@ -34,3 +34,20 @@ def accept(v):
   s.update(v + '258EAFA5-E914-47DA-95CA-C5AB0DC85B11')
   return base64.b64encode(s.digest())
 }}}
+
+= Unmasking frame manually =
+
+Use this python code
+
+{{{
+import binascii
+def conv(s):
+  return map(lambda x: ord(binascii.a2b_hex(x)), s.split(' '))
+m = conv('fd 4b 40 b8')
+d = conv('fe a1 15 d6 98 33 30 dd 9e 3f 25 dc dd 28 2f d6 89 22 2e cd 9c 3f 29 d7 93')
+r = []
+for i in xrange(len(d)):
+  r.append(d[i] ^ m[i % 4])
+print ' '.join(map(hex, r))
+print ''.join(map(chr, r))
+}}}

@@ -13,8 +13,10 @@ pywebsocket supports the following protocols.
 
 and the following extension.
 
-  * [http://tools.ietf.org/html/draft-ietf-hybi-permessage-compression-05 WebSocket Per-message Compression (permessage-deflate)] (To be supported)
+  * [http://tools.ietf.org/html/draft-ietf-hybi-permessage-compression-18 WebSocket Per-message Compression (permessage-deflate)]
   * [http://tools.ietf.org/html/draft-ietf-hybi-permessage-compression-04 WebSocket Per-message Compression (permessage-compress)] (Deprecated)
+    * draft-ietf-hybi-permessage-compression version 04 and prior specified permessage-compress extension
+    * draft-ietf-hybi-permessage-compression version 05 and later specifies permessage-deflate extension
   * [http://tools.ietf.org/html/draft-ietf-hybi-websocket-perframe-compression-04 WebSocket Per-frame Compression (perframe-compress)] (Deprecated)
   * [http://tools.ietf.org/html/draft-tyoshino-hybi-websocket-perframe-deflate-06 WebSocket Per-frame Compression (deflate-frame)] (Deprecated)
 

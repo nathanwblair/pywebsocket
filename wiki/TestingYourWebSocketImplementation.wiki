@@ -63,3 +63,15 @@ You can find files for testing at test/cert/
     * cacert
     * key
   * key.pem key for cert.pem. For server.
+
+Dump key
+
+{{{
+openssl rsa -in key.pem -text
+}}}
+
+Dump certificate
+
+{{{
+openssl x509 -in cert.pem -text
+}}}

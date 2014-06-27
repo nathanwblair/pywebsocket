@@ -51,3 +51,15 @@ for i in xrange(len(d)):
 print ' '.join(map(hex, r))
 print ''.join(map(chr, r))
 }}}
+
+= TLS =
+
+You can find files for testing at test/cert/
+
+  * cacert.pem self-signed
+  * cert.pem signed by cacert. For server.
+  * client_cert.p12 PKCS#12 container. For client.
+    * certificate
+    * cacert
+    * key
+  * key.pem key for cert.pem. For server.

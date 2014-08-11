@@ -75,3 +75,9 @@ Dump certificate
 {{{
 openssl x509 -in cert.pem -text
 }}}
+
+= TLS cipher suite =
+
+== Standard "ssl" module ==
+
+Add the "ciphers" parameter to ssl.wrap_socket() call in standalone.py.
